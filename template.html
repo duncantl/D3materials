@@ -1,0 +1,13 @@
+<html>
+<head>
+<script src="d3/d3.min.js" charset="utf-8"></script>
+</head>
+<body>
+<script>
+d3.csv("sample.csv", function(error, data) {
+       console.log("number of observations in sample.csv " + data.length);
+       d3.select("body").append("p").text(data.length);
+   });
+</script>
+</body>
+</html>
