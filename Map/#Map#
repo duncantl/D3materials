@@ -1,0 +1,35 @@
+  /Users/duncan/DSI/Workshops/D3/Map:
+  total used in directory 93096 available 9955441
+  drwxr-xr-x  28 duncan  staff       952 May 22 13:53 .
+  drwxr-xr-x  14 duncan  staff       476 May 22 13:34 ..
+  -rw-r--r--   1 duncan  staff       591 May 22 13:40 Makefile
+  -rw-r--r--   1 duncan  staff       360 May 22 13:34 Makefile~
+  -rw-r--r--   1 duncan  staff       253 May 22 13:41 index1.html
+C -rw-r--r--   1 duncan  staff       620 May 22 13:46 index2.html
+  -rw-r--r--   1 duncan  staff       253 May 22 13:41 index2.html~
+C -rw-r--r--   1 duncan  staff      2502 May 22 14:03 index8.html
+C -rw-r--r--   1 duncan  staff      2044 May 22 13:59 index7.html
+C -rw-r--r--   1 duncan  staff      1493 May 22 13:58 index6.html
+C -rw-r--r--   1 duncan  staff      1098 May 22 13:57 index5.html
+C -rw-r--r--   1 duncan  staff       953 May 22 13:53 index4.html
+C -rw-r--r--   1 duncan  staff       953 May 22 13:53 index3.html
+  -rw-r--r--   1 duncan  staff       620 May 22 13:46 index3.html~
+  -rw-r--r--@  1 duncan  staff     97488 Dec  3  2013 ne_10m_admin_0_map_subunits.README.html
+  -rw-r--r--@  1 duncan  staff         5 Dec  3  2013 ne_10m_admin_0_map_subunits.VERSION.txt
+  -rw-rw-rw-@  1 duncan  staff         5 Dec  3  2013 ne_10m_admin_0_map_subunits.cpg
+  -rw-rw-rw-@  1 duncan  staff    446046 Dec  3  2013 ne_10m_admin_0_map_subunits.dbf
+  -rw-rw-rw-@  1 duncan  staff       145 Dec  3  2013 ne_10m_admin_0_map_subunits.prj
+  -rw-rw-rw-@  1 duncan  staff   8891256 Dec  3  2013 ne_10m_admin_0_map_subunits.shp
+  -rw-rw-rw-@  1 duncan  staff      2948 Dec  3  2013 ne_10m_admin_0_map_subunits.shx
+  -rw-r--r--@  1 duncan  staff   5453364 Jun  3  2015 ne_10m_admin_0_map_subunits.zip
+  -rw-r--r--@  1 duncan  staff     23742 Jun  2  2013 ne_10m_populated_places.README.html
+  -rw-r--r--@  1 duncan  staff         5 Jun  2  2013 ne_10m_populated_places.VERSION.txt
+  -rw-rw-rw-@  1 duncan  staff         5 Oct  6  2013 ne_10m_populated_places.cpg
+  -rw-rw-rw-@  1 duncan  staff  30256138 Oct  6  2013 ne_10m_populated_places.dbf
+  -rw-rw-rw-@  1 duncan  staff       145 Oct  6  2013 ne_10m_populated_places.prj
+  -rw-rw-rw-@  1 duncan  staff    205704 Oct  7  2013 ne_10m_populated_places.shp
+  -rw-rw-rw-@  1 duncan  staff     58844 Oct  7  2013 ne_10m_populated_places.shx
+  -rw-r--r--@  1 duncan  staff   1534599 Jun  3  2015 ne_10m_populated_places.zip
+  -rw-r--r--   1 duncan  staff     82845 May 22 13:40 places.json
+  -rw-r--r--   1 duncan  staff    457423 May 22 13:40 subunits.json
+  -rw-r--r--   1 duncan  staff     78660 May 22 13:40 uk.json

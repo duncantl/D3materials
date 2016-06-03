@@ -1,0 +1,13 @@
+We have a type and a features list.
+There are 5 features, each of which is a list with 3 elements
+  type  - string
+  properties - list with about 65 elements
+  geometry - list with 2 elements
+        type
+        coordinates
+
+These geometry$type's are all MultiPolygon
+ These are many pairs of x, y coordinates it appears
+
+
+GDAL - Geospatial Data Abstraction Library

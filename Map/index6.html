@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+    /* CSS goes here. */
+
+
+.subunit.SCT { fill: #ddc; }
+.subunit.WLS { fill: #cdd; }
+.subunit.NIR { fill: #cdc; }
+.subunit.ENG { fill: #dcd; }
+.subunit.IRL { display: none; }
+
+
+.subunit-boundary {
+  fill: none;
+  stroke: #777;
+  stroke-dasharray: 2,2;
+  stroke-linejoin: round;
+}
+
+.subunit-boundary.IRL {
+  stroke: #aaa;
+}
+
+</style>
+<body>
+<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="//d3js.org/topojson.v1.min.js"></script>
+Open the JavaScript Console via the Developer Tools to see the data appear after it has been read into the "page".
+<script>
+
+var width = 960,
+    height = 1160;
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+
+   var projection = d3.geo.albers()
+                          .center([0, 55.4])
+                          .rotate([4.4, 0])
+                          .parallels([50, 60])
+                          .scale(6000)
+                          .translate([width / 2, height / 2]);
+
+   var path = d3.geo.path()
+                     .projection(projection);
+
+
+d3.json("uk.json", function(error, uk) {
+  if (error) return console.error(error);
+
+   var subunits = topojson.feature(uk, uk.objects.subunits).features;
+
+
+       svg.selectAll(".subunit")
+          .data(subunits)
+          .enter()
+           .append("path")
+           .attr("class", function(d) { return "subunit " + d.id; })
+           .attr("d", path);
+
+
+       svg.append("path")
+          .datum(topojson.mesh(uk, uk.objects.subunits, function(a, b) { return a !== b && a.id !== "IRL"; }))
+          .attr("d", path)
+          .attr("class", "subunit-boundary");
+
+svg.append("path")
+    .datum(topojson.mesh(uk, uk.objects.subunits, function(a, b) { return a === b && a.id === "IRL"; }))
+    .attr("d", path)
+    .attr("class", "subunit-boundary IRL");
+
+});
+
+</script>
