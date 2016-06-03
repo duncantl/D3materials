@@ -38,7 +38,7 @@ and then telling D3 to move the points to their new locations.
 var w = 600,
     h = 500;
 
-var padding = 40;
+var padding = 80;
 
 var svg = d3.select("body")
             .append("svg")
@@ -101,7 +101,7 @@ var wtAxis = d3.svg.axis()
 
                   //  arrange for each point to move to its new location.
               svg.selectAll("circle")
-                 .data(dataset)
+                 .data(dataset, function(d, i) {return d.type; })
                  .transition() // This is the important part.
                  .duration(5000)
                  .attr("cx", function(d) {
