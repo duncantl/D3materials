@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Simple Scatter Plot</title>
+<meta charset="utf-8">
+<script type="text/javascript" src="../d3/d3.min.js"></script>
+
+<script type="text/javascript" src="first.json"></script>
+<script type="text/javascript" src="second.json"></script>
+<script type="text/javascript" src="third.json"></script>
+
+<style>
+#A {
+ background: #F0FFFF;
+}
+
+#B {
+ background: #E6E6FA;
+}
+
+#C {
+ background: #F0E68C;
+}
+
+p.adding {
+ color: green;
+}
+p.remove {
+ color: red;
+}
+</style>
+</head>
+
+<body>
+<h1></h1>
+
+<div id="A">
+</div>
+
+
+<div id="B">
+</div>
+
+<div id="C">
+</div>
+
+
+<script type="text/javascript">
+
+var A = d3.select("#A");
+  A.selectAll("p")
+   .data(first, function(d, i) {return d[0];})
+   .enter()
+   .append("p")
+   .text(function(d, i){ return( d[0] + " " + d[1]);});
+ 
+
+ var sel = A.selectAll("p")
+            .data(second, function(d, i) {return d[0];})
+
+  var B = d3.select("#B");
+  var C = d3.select("#C");
+
+  B.append("p").text("[second] # new items " + sel.enter().size() + " ;  items to remove " + sel.exit().size() + " ; in  selection " + sel.size() );
+
+  sel.enter().append("p").attr("class", "adding").text(function(d, i) { return "[second] adding " + d[0]});
+  sel.exit().append("p").attr("class", "remove").text(function(d, i) { return "[second] removing " + d[0]});
+
+ var sel3 = A.selectAll("p")
+            .data(third, function(d, i) {return d[0];})
+
+  C.append("p").text("[third] # new items " + sel3.enter().size() + " ;  items to remove " + sel3.exit().size() + " ; in  selection " + sel3.size() );
+
+  sel3.enter().append("p").attr("class", "adding").text(function(d, i) { return "[third] adding " + d[0]});
+  sel3.exit().append("p").attr("class", "remove").text(function(d, i) { return "[third] removing " + d[0]});
+</script>
+Note that the number to be removed for the third set is due to the fact that we did not remove the ones
+when binding to the second data set.
+
+
+
+</body>
+</html>
