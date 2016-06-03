@@ -1,11 +1,12 @@
 <html>
 <head>
-<link rel="stylesheet" href="OmegaTech.css"></link>
+<link rel="stylesheet" href="CSS/OmegaTech.css"></link>
 <title>DSI: Introduction to D3, JavaScript, etc.</title>
 </head>
 <body>
 
 
+<h2>Example Interactive Plots</h2>
 
 <h2>High-level D3 plots from R</h2>
 <ul>
@@ -13,9 +14,26 @@
 <li><a href="http://moderndata.plot.ly/interactive-r-visualizations-with-d3-ggplot2-rstudio/">Plotly</a></li>
 </ul>
 
-
 <h2>Sample Code</h2>
+<ul>
+<li><a href="http://www.nytimes.com/interactive/2012/11/02/us/politics/paths-to-the-white-house.html?_r=1&">Election paths</a></li>
+<li><a href="https://bost.ocks.org/mike/nations/">GapMinder scatterplot animated over time</a></li>
+<li><a href="http://charts.animateddata.co.uk/tennis/top32.html">animated barchart</a></li>
+<li><a href="http://charts.animateddata.co.uk/tennis/matchTree.html">tennis tournament results</a></li>
+<li><a href="https://bl.ocks.org/mbostock/4062045">network graph</a></li>
+<li><a href="https://bost.ocks.org/mike/miserables/">network adjacency matrix</a></li>
+<li><a href="http://square.github.io/crossfilter/">time series with sliders</a></li>
+<li><a href="http://mbostock.github.io/d3/talk/20111116/iris-splom.html">linked plots and brushing</a></li>
+</ul>
 
+<h2>Galleries</h2>
+<ul>
+<li><a href="http://bl.ocks.org/mbostock">Mike Bostock's Gallery</a></li>
+<li><a href="https://github.com/d3/d3/wiki/Gallery">D3 Gallery</a></li>
+</ul>
+
+
+<h2>Understanding D3 Concepts</h2>
 <ul>
 <li><a href="D3.html" >D3 Introduction</a></li>
 <li><a href="svg.html" >svg.html - example of SVG</a>  and the <a href="svg.xml" >SVG file</a></li>
@@ -33,34 +51,50 @@ on the SVG display</li>
 </ul>
 
 
-<h4>Animation</h4>
-<li><a href="">Gap Minder scatterplot over time</a></li>
+<h2>Animation</h2>
+<li><a href="https://bost.ocks.org/mike/nations/">Gap Minder scatterplot over time</a></li>
 
-<h4>Layouts</h4>
+
+<h2>Selections</h2>
+<li><a href="https://bl.ocks.org/mbostock/3808218">Selections - update, new/enter, remove alphabet example</a></li>
+
+
+<h2>Layouts</h2>
 <ul>
-<li><a href="dependencyWheel.html" >Package dependency wheel</a></li>
-<li><a href="packageGraph2.html" >Package dependency as network</a></li>
-<li><a href="sampleTree.html" >Simple tree layout</a></li>
-<li><a href="XMLBookIncludes.html" >Tree of files making up a book</a></li>
+<!-- <li><a href="Layouts/dependencyWheel.html" >Package dependency wheel</a></li> -->
+<li><a href="Layouts/packageGraph2.html" >Package dependency as network</a></li>
+<li><a href="Layouts/sampleTree.html" >Simple tree layout</a></li>
+<li><a href="HTMLTree/htmlTreeInline.html" >HTML hierarchy as a D3 tree</a></li>
+<li><a href="Layouts/XMLBookIncludes.html" >Tree of files making up a book</a></li>
 </ul>
-
-<h4>Selections</h4>
-<li><a href="https://bl.ocks.org/mbostock/3808218">Selections - update, new/enter, remove example</a></li>
 
 
 <h4>Networks</h4>
-<li><a href="D3Eg/senateFisheye1.html">Fisheye lens on a network</a></li>
+<li><a href="NetworkMatrix/senateFisheye.html">Fisheye lens on a network</a></li>
+<li><a href="NetworkMatrix/AdaptingMatrix.html">Discussion of how to adapt the network matrix</a></li>
+<li><a href="NetworkMatrix/senateMatrix.html">Senate matrix</a></li>
+<li><a href="NetworkMatrix/senateMatrixLinks.html">Senate matrix with simple-minded hyperlinks</a></li>
+<li><a href="NetworkMatrix/senateMatrixLinksColoredNames.html">Senate matrix with names colored</a></li>
+<li><a href="NetworkMatrix/senateMatrixLinksGovtrackColredNames.html">Senate matrix with links to govtrack</a></li>
 
-<li>Discussion of how to adapt the network matrix</li>
-<li><a href="senateMatrix.html">Senate matrix</a></li>
-<li><a href="senateMatrixLinks.html">Senate matrix with hyperlinks</a></li>
-<li><a href="senateMatrixLinksColoredNames.html">Senate matrix with names colored</a></li>
-<li><a href="senateMatrixLinksGovtrackColredNames.html">Senate matrix with names colored</a></li>
 
+<h2>Maps</h2>
+<ul>
+<li><a href="https://bost.ocks.org/mike/map/">Let's Make a Map</a> by Mike Bostock.
+  <ul>
+<li><a href="Map/step-2.html">step 2</a></li>
+<li><a href="Map/step-3.html">step 3</a></li>
+<li><a href="Map/step-4.html">step 4</a></li>
+<li><a href="Map/step-5.html">step 5</a></li>
+<li><a href="Map/step-6.html">step 6</a></li>
+<li><a href="Map/step-7.html">step 7</a></li>
+  </ul>
+ </li>
+<li><a href="https://bl.ocks.org/mbostock/4060606">choropleth maps</a>
+</li>
+</ul>
 
 <h2>Resources</h2>
-
-
 <dl>
 <dt><li>Running a local Web Server</li></dt>
 <dd>
@@ -101,7 +135,7 @@ and this requires npm to be installed as part of the <a href="https://nodejs.org
 </dl>
 
 <dl>
-<dt><li><a href="http://cdec.water.ca.gov/cgi-progs/stages/FNFSUM">D3 Reference Documentation</a></li></dt>
+<dt><li><a href="https://github.com/d3/d3/wiki/API-Reference">D3 Reference Documentation</a></li></dt>
 <dd>
 </dd>
 
