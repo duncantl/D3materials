@@ -1,0 +1,349 @@
+{
+ "name": "table",
+"children": [
+ {
+ "name": "tr",
+"children": [
+ {
+ "name": "td",
+"children": [
+ {
+ "name": "text",
+"children": [],
+"attrs": "Date",
+"isLeaf": true 
+} 
+],
+"attrs": "align=left bgcolor=e0e0e0",
+"isLeaf": false 
+},
+{
+ "name": "td",
+"children": [
+ {
+ "name": "text",
+"children": [],
+"attrs": "",
+"isLeaf": true 
+} 
+],
+"attrs": "align=left bgcolor=e0e0e0",
+"isLeaf": false 
+},
+{
+ "name": "td",
+"children": [
+ {
+ "name": "font",
+"children": [
+ {
+ "name": "i",
+"children": [
+ {
+ "name": "a",
+"children": [
+ {
+ "name": "text",
+"children": [],
+"attrs": "MON FLO",
+"isLeaf": true 
+} 
+],
+"attrs": "href=/jspplot/jspPlotServlet.jsp?sensor_no=5317&end=06/01/2016+16:37&geom=small&interval=720&cookies=cdec01",
+"isLeaf": false 
+},
+{
+ "name": "text",
+"children": [],
+"attrs": "&nbsp",
+"isLeaf": true 
+} 
+],
+"attrs": "",
+"isLeaf": false 
+} 
+],
+"attrs": "color=black",
+"isLeaf": false 
+} 
+],
+"attrs": "align=right bgcolor=e0e0e0",
+"isLeaf": false 
+},
+{
+ "name": "td",
+"children": [
+ {
+ "name": "text",
+"children": [],
+"attrs": "",
+"isLeaf": true 
+} 
+],
+"attrs": "bgcolor=e0e0e0",
+"isLeaf": false 
+},
+{
+ "name": "text",
+"children": [],
+"attrs": "",
+"isLeaf": true 
+},
+{
+ "name": "td",
+"children": [
+ {
+ "name": "font",
+"children": [
+ {
+ "name": "i",
+"children": [
+ {
+ "name": "a",
+"children": [
+ {
+ "name": "text",
+"children": [],
+"attrs": "MON FNF",
+"isLeaf": true 
+} 
+],
+"attrs": "href=/jspplot/jspPlotServlet.jsp?sensor_no=5316&end=06/01/2016+16:37&geom=small&interval=720&cookies=cdec01",
+"isLeaf": false 
+},
+{
+ "name": "text",
+"children": [],
+"attrs": "&nbsp",
+"isLeaf": true 
+} 
+],
+"attrs": "",
+"isLeaf": false 
+} 
+],
+"attrs": "color=black",
+"isLeaf": false 
+} 
+],
+"attrs": "align=right bgcolor=e0e0e0",
+"isLeaf": false 
+},
+{
+ "name": "td",
+"children": [
+ {
+ "name": "text",
+"children": [],
+"attrs": "",
+"isLeaf": true 
+} 
+],
+"attrs": "bgcolor=e0e0e0",
+"isLeaf": false 
+},
+{
+ "name": "text",
+"children": [],
+"attrs": "",
+"isLeaf": true 
+} 
+],
+"attrs": "",
+"isLeaf": false 
+},
+{
+ "name": "tr",
+"children": [
+ {
+ "name": "td",
+"children": [
+ {
+ "name": "text",
+"children": [],
+"attrs": "",
+"isLeaf": true 
+} 
+],
+"attrs": "bgcolor=e0e0e0",
+"isLeaf": false 
+},
+{
+ "name": "td",
+"children": [
+ {
+ "name": "text",
+"children": [],
+"attrs": "",
+"isLeaf": true 
+} 
+],
+"attrs": "align=left bgcolor=e0e0e0",
+"isLeaf": false 
+},
+{
+ "name": "td",
+"children": [
+ {
+ "name": "i",
+"children": [
+ {
+ "name": "text",
+"children": [],
+"attrs": "AF",
+"isLeaf": true 
+} 
+],
+"attrs": "",
+"isLeaf": false 
+} 
+],
+"attrs": "align=center bgcolor=e0e0e0",
+"isLeaf": false 
+},
+{
+ "name": "td",
+"children": [
+ {
+ "name": "text",
+"children": [],
+"attrs": "",
+"isLeaf": true 
+} 
+],
+"attrs": "bgcolor=e0e0e0",
+"isLeaf": false 
+},
+{
+ "name": "td",
+"children": [
+ {
+ "name": "i",
+"children": [
+ {
+ "name": "text",
+"children": [],
+"attrs": "AF",
+"isLeaf": true 
+} 
+],
+"attrs": "",
+"isLeaf": false 
+} 
+],
+"attrs": "align=center bgcolor=e0e0e0",
+"isLeaf": false 
+},
+{
+ "name": "td",
+"children": [
+ {
+ "name": "text",
+"children": [],
+"attrs": "",
+"isLeaf": true 
+} 
+],
+"attrs": "bgcolor=e0e0e0",
+"isLeaf": false 
+} 
+],
+"attrs": "",
+"isLeaf": false 
+},
+{
+ "name": "tr",
+"children": [
+ {
+ "name": "td",
+"children": [
+ {
+ "name": "text",
+"children": [],
+"attrs": "07/2014",
+"isLeaf": true 
+} 
+],
+"attrs": "",
+"isLeaf": false 
+},
+{
+ "name": "td",
+"children": [],
+"attrs": "",
+"isLeaf": false 
+},
+{
+ "name": "td",
+"children": [
+ {
+ "name": "text",
+"children": [],
+"attrs": "64830",
+"isLeaf": true 
+} 
+],
+"attrs": "align=right",
+"isLeaf": false 
+},
+{
+ "name": "td",
+"children": [
+ {
+ "name": "a",
+"children": [
+ {
+ "name": "text",
+"children": [],
+"attrs": "r",
+"isLeaf": true 
+} 
+],
+"attrs": "href=/misc/flaglist.html style=text-decoration:none",
+"isLeaf": false 
+} 
+],
+"attrs": "align=right",
+"isLeaf": false 
+},
+{
+ "name": "td",
+"children": [
+ {
+ "name": "text",
+"children": [],
+"attrs": "9975",
+"isLeaf": true 
+} 
+],
+"attrs": "align=right",
+"isLeaf": false 
+},
+{
+ "name": "td",
+"children": [
+ {
+ "name": "a",
+"children": [
+ {
+ "name": "text",
+"children": [],
+"attrs": "",
+"isLeaf": true 
+} 
+],
+"attrs": "href=/misc/flaglist.html style=text-decoration:none",
+"isLeaf": false 
+} 
+],
+"attrs": "align=right",
+"isLeaf": false 
+} 
+],
+"attrs": "",
+"isLeaf": false 
+} 
+],
+"attrs": "width=260 border=0 cellspacing=0 cellpadding=0",
+"isLeaf": false 
+}

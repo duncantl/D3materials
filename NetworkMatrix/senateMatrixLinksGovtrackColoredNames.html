@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html class="ocks-org do-not-copy">
+<!-- http://bost.ocks.org/mike/miserables/  -->
+<meta charset="utf-8">
+<title>Senate Co-occurrence</title>
+<style>
+
+.background {
+  border:  5pt solid red;
+  fill: #eee;
+}
+
+line {
+  stroke: #fff;
+}
+
+text.active {
+  fill: yellow;
+}
+
+svg rect {
+ border: 1pt solid black;
+}
+
+
+text.Democrat {
+   fill: blue;
+}
+
+text.Republican {
+   fill: red;
+}
+
+text.Independent {
+   fill: green;
+}
+
+</style>
+<script src="d3.min.js" charset="utf-8"></script>
+
+
+<h3>Adapted from an Example by Mike Bostock</h3>
+
+<aside style="margin-top:80px; float: right; valign: top">
+<p>Order: <select id="order">
+  <option value="name">by Name</option>
+  <option value="count">by Frequency</option>
+  <option value="group">by Cluster</option>
+</select>
+
+<p>This matrix diagram visualizes character co-occurrences </i>.
+
+<p>Each colored cell represents co-sponorship between two senators; colors represent party affiliation.
+
+<p>Use the drop-down menu to reorder the matrix and explore the data.
+
+<p>Built with <a href="http://d3js.org/">d3.js</a>.
+</aside>
+
+<script>
+var margin = {top: 150, right: 0, bottom: 10, left: 150},
+    width = 1200,
+    height = 1200;
+
+var x = d3.scale.ordinal().rangeBands([0, width]),
+    z = d3.scale.linear().domain([0, 4]).clamp(true),  //XXX Change the next two lines for different colors!!!!
+    c = d3.scale.category10().domain(d3.range(10));
+
+var svg = d3.select("body")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.json("senateMatrix.json", function(data) {
+  var matrix = [],
+      nodes = data.nodes,
+      n = nodes.length;
+
+    // Compute index per node.
+  nodes.forEach(function(node, i) {
+    node.index = i;
+    node.count = 0;
+    matrix[i] = d3.range(n).map(function(j) { return {x: j, y: i, z: 0}; });
+  });
+
+  // Convert links to matrix; count character occurrences.
+  data.links.forEach(function(link) {
+    matrix[link.source][link.target].z += link.value;
+    matrix[link.target][link.source].z += link.value;
+    matrix[link.source][link.source].z += link.value;
+    matrix[link.target][link.target].z += link.value;
+    nodes[link.source].count += link.value;
+    nodes[link.target].count += link.value;
+  });
+
+  // Precompute the orders.
+  var orders = {
+    name: d3.range(n).sort(function(a, b) { return d3.ascending(nodes[a].name, nodes[b].name); }),
+    count: d3.range(n).sort(function(a, b) { return nodes[b].count - nodes[a].count; }),
+    group: d3.range(n).sort(function(a, b) { return nodes[b].group - nodes[a].group; })
+  };
+
+  // The default sort order.
+  x.domain(orders.name);
+
+  svg.append("rect")
+      .attr("class", "background")
+      .attr("width", width)
+      .attr("height", height);
+
+  var row = svg.selectAll(".row")
+      .data(matrix)
+      .enter().append("g")
+      .attr("class", "row")
+      .attr("transform", function(d, i) { return "translate(0," + x(i) + ")"; })
+      .each(row);  // call the row function defined below
+
+  row.append("line")
+      .attr("x2", width);
+
+  row.append("a")
+      .attr("xlink:href", function(d, i) { return makeGovLinkURL(nodes[i]) })
+      .append("text")
+      .attr("x", -6)
+      .attr("y", x.rangeBand() / 2)
+      .attr("dy", ".32em")
+      .attr("text-anchor", "end")
+      .attr("class", function(d, i) { return nodes[i].party;  } )
+      .text(function(d, i) { return nodes[i].name; });
+
+  var column = svg.selectAll(".column")
+      .data(matrix)
+      .enter().append("g")
+      .attr("class", "column")
+      .attr("transform", function(d, i) { return "translate(" + x(i) + ")rotate(-90)"; });
+
+  column.append("line")
+      .attr("x1", - width);
+
+  column.append("a")
+      .attr("xlink:href", function(d, i) { return makeGovLinkURL(nodes[i]) })  // Same as above for rows
+      .append("text")
+      .attr("x", 6)
+      .attr("y", x.rangeBand() / 2)
+      .attr("dy", ".32em")
+      .attr("text-anchor", "start")
+      .attr("class", function(d, i) { return nodes[i].party;  } )  // Same as above for rows.
+      .text(function(d, i) { return nodes[i].name; });
+
+  function row(row, rowNum) {
+    var cell = d3.select(this).selectAll(".cell")
+             /*  If we filter out certain cells, the column numbers become very complicated. So let's not skip  the empty cells. */
+   //   .data(row.filter(function(d) { return d.z; })) // only values that have a non-zero z  value. So what is z measuring - the count in this cell ?
+        .data()
+        .enter()
+        .append("rect")
+        .attr("class", "cell")
+        .attr("rowIndex", function(d) { return rowNum; })
+        .attr("colIndex", function(d, i) { return i; })
+        .attr("x", function(d) { return x(d.x); })
+        .attr("width", x.rangeBand())
+        .attr("height", x.rangeBand())
+        .style("fill-opacity", function(d) { return z(d.z); })
+        .style("fill", function(d) { return nodes[d.x].group == nodes[d.y].group ? c(nodes[d.x].group) : null; })
+        .on("mouseover", mouseover)
+        .on("mouseout", mouseout)
+        .on("click",  function(val, i) { return clickCell(val, i, rowNum) })
+        .each(function(d, i) { return addTooltip(d3.select(this), i, rowNum) ; });
+            /* Note the way we obtain the newly created rect element in the DOM via d3.select(this).
+               See Mastering D3.js p25*/
+  }
+
+  function addTooltip(obj, i, j) {
+     obj.append("title").text( nodes[j].name + " " + nodes[i].name + ": " + matrix[j][i].z);
+     return obj;
+  }
+
+  function clickCell(obj, i, row) {
+     var txt = "";
+     alert(obj + " " + typeof(obj) + " " + "  " + i + " " + row + " " + txt + " "  + nodes[row].name + " " + nodes[i].name + " " + matrix[row][i].z);
+  }
+
+  function mouseover(p) {
+    d3.selectAll(".row text").classed("active", function(d, i) { return i == p.y; });
+    d3.selectAll(".column text").classed("active", function(d, i) { return i == p.x; });
+  }
+
+  function mouseout() {
+    d3.selectAll("text").classed("active", false);
+  }
+
+  d3.select("#order").on("change", function() {
+    clearTimeout(timeout);
+    order(this.value);
+  });
+
+  function order(value) {
+    x.domain(orders[value]);
+
+    var t = svg.transition().duration(250);
+
+    t.selectAll(".row")
+        .delay(function(d, i) { return x(i) * 4; })
+        .attr("transform", function(d, i) { return "translate(0," + x(i) + ")"; })
+        .selectAll(".cell")
+        .delay(function(d) { return x(d.x) * 4; })
+        .attr("x", function(d) { return x(d.x); });
+
+    t.selectAll(".column")
+        .delay(function(d, i) { return x(i) * 4; })
+        .attr("transform", function(d, i) { return "translate(" + x(i) + ")rotate(-90)"; });
+  }
+
+  var timeout = setTimeout(function() {
+    order("group");
+    d3.select("#order").property("selectedIndex", 2).node().focus();
+  }, 5000);
+});
+
+/* Create the GovTrack.us link for this member of congress. */
+function makeGovLinkURL(node)
+{
+   return "http://govtrack.us/congress/members/" +  mkName(node.name) + "/" + node.govtrack_id;
+}
+
+function mkName(name)
+{
+  return( name.replace(" ", "_").toLowerCase() ) ;
+}
+
+
+
+/* To find the names of the properties in an object */
+function propertyNames(obj)
+{
+     var txt = "";
+     for(var name in obj) {
+        txt += name + " ";
+     }
+     return(txt);
+}
+
+</script>
+
+<p class="attribution">Source: <a href="http://www.govtrack.us" >GovTrack</a>.
+
+<p>A network can be represented by an <i><a href="http://en.wikipedia.org/wiki/Adjacency_matrix">adjacency matrix</a></i>, where each cell <i>ij</i> represents an edge from vertex <i>i</i> to vertex <i>j</i>. Here, vertices represent characters in a book, while edges represent co-occurrence in a chapter.
+
+<p>The effectiveness of a matrix diagram is heavily dependent on the order of rows and columns: if related nodes are placed closed to each other, it is easier to identify clusters and bridges.
+
+<p>This example lets you try different orderings via the drop-down menu. This type of diagram can be extended with manual reordering of rows and columns, and expanding or collapsing of clusters, to allow deeper exploration. <a href="http://en.wikipedia.org/wiki/Jacques_Bertin">Jacques Bertin</a> (or more specifically, his fleet of assistants) did this by hand with paper strips.
+
+<p>While path-following is harder in a matrix view than in a <a href="http://mbostock.github.com/d3/ex/force.html">node-link diagram</a>, matrices have other advantages. As networks get large and highly connected, node-link diagrams often devolve into giant hairballs of line crossings. Line crossings are impossible with matrix views. Matrix cells can also be encoded to show additional data; here color depicts clusters computed by a community-detection algorithm.
+
+<p>
+
+
+
+<p>
+Add
+<ul>
+  <li>Hyperlinks to the people's names</li>
+  <li>link the hyperlinks to the govtrack_id's</li>
+  <li>color the names by party</li>
+
+  <li>Change the colors to have greater resolution - red/orange to more variation/spread</li>
+
+  <li>tooltips for the rectangles in the matrix to give counts (or use an alert for now)</li>
+  <li>click on a rectangle in the matrix to get a list of the co-sponsored bills</li>
+  <li>click on the rectangle and higlight all the senators that the person co-sponsored a bill
+  with.</li>
+  
+  <li>Add a legend for the colors (see the scales for x, z, and c near the top of the &lt;script&gt;</li>
+
+  
+</ul>
+
+</p>
+
+

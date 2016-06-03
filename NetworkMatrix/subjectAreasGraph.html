@@ -1,0 +1,132 @@
+
+        <!DOCTYPE html>
+        <meta charset="utf-8">
+        <body> 
+ <style>
+.link {
+stroke: #666;
+opacity: 0.6;
+stroke-width: 1.5px;
+}
+.node circle {
+stroke: #fff;
+opacity: 0.6;
+stroke-width: 1.5px;
+}
+text {
+font: 7px serif;
+opacity: 0.6;
+pointer-events: none;
+}
+</style>
+
+<script src=http://d3js.org/d3.v3.min.js></script>
+
+<script> 
+ var links = [ { "source" : "NEUR", "target" : "NEUR" }, { "source" : "NEUR", "target" : "IMMU" }, { "source" : "NEUR", "target" : "MEDI" }, { "source" : "NEUR", "target" : "PHAR" }, { "source" : "NEUR", "target" : "AGRI" }, { "source" : "NEUR", "target" : "BIOC" }, { "source" : "NEUR", "target" : "SOCI" }, { "source" : "NEUR", "target" : "COMP" }, { "source" : "NEUR", "target" : "HEAL" }, { "source" : "NEUR", "target" : "CENG" }, { "source" : "NEUR", "target" : "ARTS" }, { "source" : "NEUR", "target" : "PSYC" }, { "source" : "NEUR", "target" : "NURS" }, { "source" : "IMMU", "target" : "NEUR" }, { "source" : "IMMU", "target" : "IMMU" }, { "source" : "IMMU", "target" : "MEDI" }, { "source" : "IMMU", "target" : "PHAR" }, { "source" : "IMMU", "target" : "AGRI" }, { "source" : "IMMU", "target" : "ENGI" }, { "source" : "IMMU", "target" : "BIOC" }, { "source" : "IMMU", "target" : "ENVI" }, { "source" : "IMMU", "target" : "MATH" }, { "source" : "IMMU", "target" : "CENG" }, { "source" : "IMMU", "target" : "VETE" }, { "source" : "MEDI", "target" : "NEUR" }, { "source" : "MEDI", "target" : "IMMU" }, { "source" : "MEDI", "target" : "MEDI" }, { "source" : "MEDI", "target" : "PHAR" }, { "source" : "MEDI", "target" : "AGRI" }, { "source" : "MEDI", "target" : "ENGI" }, { "source" : "MEDI", "target" : "MATE" }, { "source" : "MEDI", "target" : "BIOC" }, { "source" : "MEDI", "target" : "PHYS" }, { "source" : "MEDI", "target" : "MULT" }, { "source" : "MEDI", "target" : "ENVI" }, { "source" : "MEDI", "target" : "SOCI" }, { "source" : "MEDI", "target" : "CHEM" }, { "source" : "MEDI", "target" : "COMP" }, { "source" : "MEDI", "target" : "MATH" }, { "source" : "MEDI", "target" : "HEAL" }, { "source" : "MEDI", "target" : "CENG" }, { "source" : "MEDI", "target" : "ARTS" }, { "source" : "MEDI", "target" : "BUSI" }, { "source" : "MEDI", "target" : "PSYC" }, { "source" : "MEDI", "target" : "ECON" }, { "source" : "MEDI", "target" : "NURS" }, { "source" : "MEDI", "target" : "VETE" }, { "source" : "MEDI", "target" : "DENT" }, { "source" : "MEDI", "target" : "DECI" }, { "source" : "PHAR", "target" : "NEUR" }, { "source" : "PHAR", "target" : "IMMU" }, { "source" : "PHAR", "target" : "MEDI" }, { "source" : "PHAR", "target" : "PHAR" }, { "source" : "PHAR", "target" : "AGRI" }, { "source" : "PHAR", "target" : "ENGI" }, { "source" : "PHAR", "target" : "MATE" }, { "source" : "PHAR", "target" : "BIOC" }, { "source" : "PHAR", "target" : "ENVI" }, { "source" : "PHAR", "target" : "SOCI" }, { "source" : "PHAR", "target" : "CHEM" }, { "source" : "PHAR", "target" : "COMP" }, { "source" : "PHAR", "target" : "MATH" }, { "source" : "PHAR", "target" : "CENG" }, { "source" : "PHAR", "target" : "ARTS" }, { "source" : "PHAR", "target" : "PSYC" }, { "source" : "PHAR", "target" : "NURS" }, { "source" : "PHAR", "target" : "VETE" }, { "source" : "PHAR", "target" : "DECI" }, { "source" : "AGRI", "target" : "NEUR" }, { "source" : "AGRI", "target" : "IMMU" }, { "source" : "AGRI", "target" : "MEDI" }, { "source" : "AGRI", "target" : "PHAR" }, { "source" : "AGRI", "target" : "AGRI" }, { "source" : "AGRI", "target" : "ENGI" }, { "source" : "AGRI", "target" : "MATE" }, { "source" : "AGRI", "target" : "BIOC" }, { "source" : "AGRI", "target" : "ENVI" }, { "source" : "AGRI", "target" : "SOCI" }, { "source" : "AGRI", "target" : "CHEM" }, { "source" : "AGRI", "target" : "EART" }, { "source" : "AGRI", "target" : "MATH" }, { "source" : "AGRI", "target" : "CENG" }, { "source" : "AGRI", "target" : "ARTS" }, { "source" : "AGRI", "target" : "ECON" }, { "source" : "AGRI", "target" : "NURS" }, { "source" : "AGRI", "target" : "VETE" }, { "source" : "AGRI", "target" : "DECI" }, { "source" : "ENGI", "target" : "IMMU" }, { "source" : "ENGI", "target" : "MEDI" }, { "source" : "ENGI", "target" : "PHAR" }, { "source" : "ENGI", "target" : "AGRI" }, { "source" : "ENGI", "target" : "ENGI" }, { "source" : "ENGI", "target" : "MATE" }, { "source" : "ENGI", "target" : "BIOC" }, { "source" : "ENGI", "target" : "PHYS" }, { "source" : "ENGI", "target" : "ENVI" }, { "source" : "ENGI", "target" : "SOCI" }, { "source" : "ENGI", "target" : "CHEM" }, { "source" : "ENGI", "target" : "EART" }, { "source" : "ENGI", "target" : "COMP" }, { "source" : "ENGI", "target" : "MATH" }, { "source" : "ENGI", "target" : "HEAL" }, { "source" : "ENGI", "target" : "CENG" }, { "source" : "ENGI", "target" : "ARTS" }, { "source" : "ENGI", "target" : "BUSI" }, { "source" : "ENGI", "target" : "ENER" }, { "source" : "ENGI", "target" : "DECI" }, { "source" : "MATE", "target" : "MEDI" }, { "source" : "MATE", "target" : "PHAR" }, { "source" : "MATE", "target" : "AGRI" }, { "source" : "MATE", "target" : "ENGI" }, { "source" : "MATE", "target" : "MATE" }, { "source" : "MATE", "target" : "BIOC" }, { "source" : "MATE", "target" : "PHYS" }, { "source" : "MATE", "target" : "ENVI" }, { "source" : "MATE", "target" : "CHEM" }, { "source" : "MATE", "target" : "EART" }, { "source" : "MATE", "target" : "COMP" }, { "source" : "MATE", "target" : "MATH" }, { "source" : "MATE", "target" : "CENG" }, { "source" : "MATE", "target" : "BUSI" }, { "source" : "MATE", "target" : "ENER" }, { "source" : "BIOC", "target" : "NEUR" }, { "source" : "BIOC", "target" : "IMMU" }, { "source" : "BIOC", "target" : "MEDI" }, { "source" : "BIOC", "target" : "PHAR" }, { "source" : "BIOC", "target" : "AGRI" }, { "source" : "BIOC", "target" : "ENGI" }, { "source" : "BIOC", "target" : "MATE" }, { "source" : "BIOC", "target" : "BIOC" }, { "source" : "BIOC", "target" : "PHYS" }, { "source" : "BIOC", "target" : "MULT" }, { "source" : "BIOC", "target" : "ENVI" }, { "source" : "BIOC", "target" : "SOCI" }, { "source" : "BIOC", "target" : "CHEM" }, { "source" : "BIOC", "target" : "COMP" }, { "source" : "BIOC", "target" : "MATH" }, { "source" : "BIOC", "target" : "HEAL" }, { "source" : "BIOC", "target" : "CENG" }, { "source" : "BIOC", "target" : "ARTS" }, { "source" : "BIOC", "target" : "PSYC" }, { "source" : "BIOC", "target" : "VETE" }, { "source" : "BIOC", "target" : "DECI" }, { "source" : "PHYS", "target" : "MEDI" }, { "source" : "PHYS", "target" : "ENGI" }, { "source" : "PHYS", "target" : "MATE" }, { "source" : "PHYS", "target" : "BIOC" }, { "source" : "PHYS", "target" : "PHYS" }, { "source" : "PHYS", "target" : "ENVI" }, { "source" : "PHYS", "target" : "SOCI" }, { "source" : "PHYS", "target" : "CHEM" }, { "source" : "PHYS", "target" : "EART" }, { "source" : "PHYS", "target" : "COMP" }, { "source" : "PHYS", "target" : "MATH" }, { "source" : "PHYS", "target" : "HEAL" }, { "source" : "PHYS", "target" : "CENG" }, { "source" : "PHYS", "target" : "ARTS" }, { "source" : "PHYS", "target" : "BUSI" }, { "source" : "PHYS", "target" : "ENER" }, { "source" : "MULT", "target" : "MEDI" }, { "source" : "MULT", "target" : "BIOC" }, { "source" : "MULT", "target" : "MULT" }, { "source" : "ENVI", "target" : "IMMU" }, { "source" : "ENVI", "target" : "MEDI" }, { "source" : "ENVI", "target" : "PHAR" }, { "source" : "ENVI", "target" : "AGRI" }, { "source" : "ENVI", "target" : "ENGI" }, { "source" : "ENVI", "target" : "MATE" }, { "source" : "ENVI", "target" : "BIOC" }, { "source" : "ENVI", "target" : "PHYS" }, { "source" : "ENVI", "target" : "ENVI" }, { "source" : "ENVI", "target" : "SOCI" }, { "source" : "ENVI", "target" : "CHEM" }, { "source" : "ENVI", "target" : "EART" }, { "source" : "ENVI", "target" : "COMP" }, { "source" : "ENVI", "target" : "MATH" }, { "source" : "ENVI", "target" : "CENG" }, { "source" : "ENVI", "target" : "ARTS" }, { "source" : "ENVI", "target" : "BUSI" }, { "source" : "ENVI", "target" : "ECON" }, { "source" : "ENVI", "target" : "ENER" }, { "source" : "ENVI", "target" : "VETE" }, { "source" : "ENVI", "target" : "DECI" }, { "source" : "SOCI", "target" : "NEUR" }, { "source" : "SOCI", "target" : "MEDI" }, { "source" : "SOCI", "target" : "PHAR" }, { "source" : "SOCI", "target" : "AGRI" }, { "source" : "SOCI", "target" : "ENGI" }, { "source" : "SOCI", "target" : "BIOC" }, { "source" : "SOCI", "target" : "PHYS" }, { "source" : "SOCI", "target" : "ENVI" }, { "source" : "SOCI", "target" : "SOCI" }, { "source" : "SOCI", "target" : "CHEM" }, { "source" : "SOCI", "target" : "EART" }, { "source" : "SOCI", "target" : "COMP" }, { "source" : "SOCI", "target" : "MATH" }, { "source" : "SOCI", "target" : "HEAL" }, { "source" : "SOCI", "target" : "CENG" }, { "source" : "SOCI", "target" : "ARTS" }, { "source" : "SOCI", "target" : "BUSI" }, { "source" : "SOCI", "target" : "PSYC" }, { "source" : "SOCI", "target" : "ECON" }, { "source" : "SOCI", "target" : "ENER" }, { "source" : "SOCI", "target" : "NURS" }, { "source" : "SOCI", "target" : "DECI" }, { "source" : "CHEM", "target" : "MEDI" }, { "source" : "CHEM", "target" : "PHAR" }, { "source" : "CHEM", "target" : "AGRI" }, { "source" : "CHEM", "target" : "ENGI" }, { "source" : "CHEM", "target" : "MATE" }, { "source" : "CHEM", "target" : "BIOC" }, { "source" : "CHEM", "target" : "PHYS" }, { "source" : "CHEM", "target" : "ENVI" }, { "source" : "CHEM", "target" : "SOCI" }, { "source" : "CHEM", "target" : "CHEM" }, { "source" : "CHEM", "target" : "COMP" }, { "source" : "CHEM", "target" : "MATH" }, { "source" : "CHEM", "target" : "CENG" }, { "source" : "CHEM", "target" : "ENER" }, { "source" : "EART", "target" : "AGRI" }, { "source" : "EART", "target" : "ENGI" }, { "source" : "EART", "target" : "MATE" }, { "source" : "EART", "target" : "PHYS" }, { "source" : "EART", "target" : "ENVI" }, { "source" : "EART", "target" : "SOCI" }, { "source" : "EART", "target" : "EART" }, { "source" : "EART", "target" : "COMP" }, { "source" : "EART", "target" : "MATH" }, { "source" : "EART", "target" : "ECON" }, { "source" : "EART", "target" : "ENER" }, { "source" : "COMP", "target" : "NEUR" }, { "source" : "COMP", "target" : "MEDI" }, { "source" : "COMP", "target" : "PHAR" }, { "source" : "COMP", "target" : "ENGI" }, { "source" : "COMP", "target" : "MATE" }, { "source" : "COMP", "target" : "BIOC" }, { "source" : "COMP", "target" : "PHYS" }, { "source" : "COMP", "target" : "ENVI" }, { "source" : "COMP", "target" : "SOCI" }, { "source" : "COMP", "target" : "CHEM" }, { "source" : "COMP", "target" : "EART" }, { "source" : "COMP", "target" : "COMP" }, { "source" : "COMP", "target" : "MATH" }, { "source" : "COMP", "target" : "HEAL" }, { "source" : "COMP", "target" : "BUSI" }, { "source" : "COMP", "target" : "PSYC" }, { "source" : "COMP", "target" : "ENER" }, { "source" : "COMP", "target" : "DECI" }, { "source" : "MATH", "target" : "IMMU" }, { "source" : "MATH", "target" : "MEDI" }, { "source" : "MATH", "target" : "PHAR" }, { "source" : "MATH", "target" : "AGRI" }, { "source" : "MATH", "target" : "ENGI" }, { "source" : "MATH", "target" : "MATE" }, { "source" : "MATH", "target" : "BIOC" }, { "source" : "MATH", "target" : "PHYS" }, { "source" : "MATH", "target" : "ENVI" }, { "source" : "MATH", "target" : "SOCI" }, { "source" : "MATH", "target" : "CHEM" }, { "source" : "MATH", "target" : "EART" }, { "source" : "MATH", "target" : "COMP" }, { "source" : "MATH", "target" : "MATH" }, { "source" : "MATH", "target" : "CENG" }, { "source" : "MATH", "target" : "ECON" }, { "source" : "MATH", "target" : "ENER" }, { "source" : "MATH", "target" : "DECI" }, { "source" : "HEAL", "target" : "NEUR" }, { "source" : "HEAL", "target" : "MEDI" }, { "source" : "HEAL", "target" : "ENGI" }, { "source" : "HEAL", "target" : "BIOC" }, { "source" : "HEAL", "target" : "PHYS" }, { "source" : "HEAL", "target" : "SOCI" }, { "source" : "HEAL", "target" : "COMP" }, { "source" : "HEAL", "target" : "HEAL" }, { "source" : "HEAL", "target" : "PSYC" }, { "source" : "HEAL", "target" : "NURS" }, { "source" : "CENG", "target" : "NEUR" }, { "source" : "CENG", "target" : "IMMU" }, { "source" : "CENG", "target" : "MEDI" }, { "source" : "CENG", "target" : "PHAR" }, { "source" : "CENG", "target" : "AGRI" }, { "source" : "CENG", "target" : "ENGI" }, { "source" : "CENG", "target" : "MATE" }, { "source" : "CENG", "target" : "BIOC" }, { "source" : "CENG", "target" : "PHYS" }, { "source" : "CENG", "target" : "ENVI" }, { "source" : "CENG", "target" : "SOCI" }, { "source" : "CENG", "target" : "CHEM" }, { "source" : "CENG", "target" : "MATH" }, { "source" : "CENG", "target" : "CENG" }, { "source" : "CENG", "target" : "ENER" }, { "source" : "ARTS", "target" : "NEUR" }, { "source" : "ARTS", "target" : "MEDI" }, { "source" : "ARTS", "target" : "PHAR" }, { "source" : "ARTS", "target" : "AGRI" }, { "source" : "ARTS", "target" : "ENGI" }, { "source" : "ARTS", "target" : "BIOC" }, { "source" : "ARTS", "target" : "PHYS" }, { "source" : "ARTS", "target" : "ENVI" }, { "source" : "ARTS", "target" : "SOCI" }, { "source" : "ARTS", "target" : "ARTS" }, { "source" : "ARTS", "target" : "BUSI" }, { "source" : "ARTS", "target" : "PSYC" }, { "source" : "ARTS", "target" : "ECON" }, { "source" : "ARTS", "target" : "NURS" }, { "source" : "ARTS", "target" : "DECI" }, { "source" : "BUSI", "target" : "MEDI" }, { "source" : "BUSI", "target" : "ENGI" }, { "source" : "BUSI", "target" : "MATE" }, { "source" : "BUSI", "target" : "PHYS" }, { "source" : "BUSI", "target" : "ENVI" }, { "source" : "BUSI", "target" : "SOCI" }, { "source" : "BUSI", "target" : "COMP" }, { "source" : "BUSI", "target" : "ARTS" }, { "source" : "BUSI", "target" : "BUSI" }, { "source" : "BUSI", "target" : "ECON" }, { "source" : "BUSI", "target" : "ENER" }, { "source" : "PSYC", "target" : "NEUR" }, { "source" : "PSYC", "target" : "MEDI" }, { "source" : "PSYC", "target" : "PHAR" }, { "source" : "PSYC", "target" : "BIOC" }, { "source" : "PSYC", "target" : "SOCI" }, { "source" : "PSYC", "target" : "COMP" }, { "source" : "PSYC", "target" : "HEAL" }, { "source" : "PSYC", "target" : "ARTS" }, { "source" : "PSYC", "target" : "PSYC" }, { "source" : "PSYC", "target" : "ECON" }, { "source" : "PSYC", "target" : "NURS" }, { "source" : "ECON", "target" : "MEDI" }, { "source" : "ECON", "target" : "AGRI" }, { "source" : "ECON", "target" : "ENVI" }, { "source" : "ECON", "target" : "SOCI" }, { "source" : "ECON", "target" : "EART" }, { "source" : "ECON", "target" : "MATH" }, { "source" : "ECON", "target" : "ARTS" }, { "source" : "ECON", "target" : "BUSI" }, { "source" : "ECON", "target" : "PSYC" }, { "source" : "ECON", "target" : "ECON" }, { "source" : "ECON", "target" : "DECI" }, { "source" : "ENER", "target" : "ENGI" }, { "source" : "ENER", "target" : "MATE" }, { "source" : "ENER", "target" : "PHYS" }, { "source" : "ENER", "target" : "ENVI" }, { "source" : "ENER", "target" : "SOCI" }, { "source" : "ENER", "target" : "CHEM" }, { "source" : "ENER", "target" : "EART" }, { "source" : "ENER", "target" : "COMP" }, { "source" : "ENER", "target" : "MATH" }, { "source" : "ENER", "target" : "CENG" }, { "source" : "ENER", "target" : "BUSI" }, { "source" : "ENER", "target" : "ENER" }, { "source" : "NURS", "target" : "NEUR" }, { "source" : "NURS", "target" : "MEDI" }, { "source" : "NURS", "target" : "PHAR" }, { "source" : "NURS", "target" : "AGRI" }, { "source" : "NURS", "target" : "SOCI" }, { "source" : "NURS", "target" : "HEAL" }, { "source" : "NURS", "target" : "ARTS" }, { "source" : "NURS", "target" : "PSYC" }, { "source" : "NURS", "target" : "NURS" }, { "source" : "VETE", "target" : "IMMU" }, { "source" : "VETE", "target" : "MEDI" }, { "source" : "VETE", "target" : "PHAR" }, { "source" : "VETE", "target" : "AGRI" }, { "source" : "VETE", "target" : "BIOC" }, { "source" : "VETE", "target" : "ENVI" }, { "source" : "VETE", "target" : "VETE" }, { "source" : "DENT", "target" : "MEDI" }, { "source" : "DENT", "target" : "DENT" }, { "source" : "DECI", "target" : "MEDI" }, { "source" : "DECI", "target" : "PHAR" }, { "source" : "DECI", "target" : "AGRI" }, { "source" : "DECI", "target" : "ENGI" }, { "source" : "DECI", "target" : "BIOC" }, { "source" : "DECI", "target" : "ENVI" }, { "source" : "DECI", "target" : "SOCI" }, { "source" : "DECI", "target" : "COMP" }, { "source" : "DECI", "target" : "MATH" }, { "source" : "DECI", "target" : "ARTS" }, { "source" : "DECI", "target" : "ECON" }, { "source" : "DECI", "target" : "DECI" } ] ; 
+ var nodes = {}
+
+// Compute the distinct nodes from the links.
+links.forEach(function(link) {
+link.source = nodes[link.source] ||
+(nodes[link.source] = {name: link.source});
+link.target = nodes[link.target] ||
+(nodes[link.target] = {name: link.target});
+link.value = +link.value;
+});
+
+var width = 1000
+height = 1000;
+
+var force = d3.layout.force()
+.nodes(d3.values(nodes))
+.links(links)
+.size([width, height])
+.linkDistance(300)
+.charge(-200)
+.on("tick", tick)
+.start();
+
+var svg = d3.select("body").append("svg")
+.attr("width", width)
+.attr("height", height);
+
+var link = svg.selectAll(".link")
+.data(force.links())
+.enter().append("line")
+.attr("class", "link");
+
+var node = svg.selectAll(".node")
+.data(force.nodes())
+.enter().append("g")
+.attr("class", "node")
+.on("mouseover", mouseover)
+.on("mouseout", mouseout)
+.on("click", click)
+.on("dblclick", dblclick)
+.call(force.drag);
+
+node.append("circle")
+.attr("r", 8)
+.style("fill", "#3182bd");
+
+node.append("text")
+.attr("x", 12)
+.attr("dy", ".35em")
+.style("fill", "#3182bd")
+.text(function(d) { return d.name; });
+
+function tick() {
+link
+.attr("x1", function(d) { return d.source.x; })
+.attr("y1", function(d) { return d.source.y; })
+.attr("x2", function(d) { return d.target.x; })
+.attr("y2", function(d) { return d.target.y; });
+
+node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+}
+
+function mouseover() {
+d3.select(this).select("circle").transition()
+.duration(750)
+.attr("r", 16);
+}
+
+function mouseout() {
+d3.select(this).select("circle").transition()
+.duration(750)
+.attr("r", 8);
+}
+// action to take on mouse click
+function click() {
+d3.select(this).select("text").transition()
+.duration(750)
+.attr("x", 22)
+.style("stroke-width", ".5px")
+.style("opacity", 1)
+.style("fill", "#E34A33")
+.style("font", "17.5px serif");
+d3.select(this).select("circle").transition()
+.duration(750)
+.style("fill", "#E34A33")
+.attr("r", 16)
+}
+
+// action to take on mouse double click
+function dblclick() {
+d3.select(this).select("circle").transition()
+.duration(750)
+.attr("r", 6)
+.style("fill", "#E34A33");
+d3.select(this).select("text").transition()
+.duration(750)
+.attr("x", 12)
+.style("stroke", "none")
+.style("fill", "#E34A33")
+.style("stroke", "none")
+.style("opacity", 0.6)
+.style("font", "7px serif");
+}
+
+</script>
+ </body>

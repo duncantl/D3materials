@@ -1,0 +1,36 @@
+<html> <head>
+<meta charset="utf-8">
+<title></title>
+<script type="text/javascript" src="d3.min.js"></script>
+<script type="text/javascript" src="DependencyWheel/js/d3.dependencyWheel.js"></script>
+
+<script type="text/javascript" src="senateWheel.json"></script>
+
+<style>
+svg text {
+  fill: red;
+  font-size: 5pt;
+}
+</style>
+</head>
+
+<body>
+<h1></h1>
+
+<p id="chart_placeholder">
+
+</p>
+
+<script>
+var chart = d3.chart.dependencyWheel();
+d3.select('#chart_placeholder')
+  .datum(data)
+  .call(chart);
+</script>
+
+
+<hr>
+<address><a href="http://www.stat.ucdavis.edu/~duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@r-project.org>&lt;duncan@r-project.org&gt;</a></address>
+<!-- hhmts start --> Last modified: Wed Nov 11 12:57:52 PST 2015 <!-- hhmts end -->
+</body> </html>

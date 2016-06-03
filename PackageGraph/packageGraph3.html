@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<meta charset="utf-8">
+<script type="text/javascript" src="d3-book/d3/d3.v3.js"></script>
+<script type="text/javascript" src="packageNetwork.json"></script>
+<script type="text/javascript" src="packageDescriptions.json"></script>
+<script type="text/javascript" src="showPackage.js"></script>
+<title></title>
+
+</head>
+
+<body>
+<h1></h1>
+
+Adds tooltips to the nodes.
+
+
+<div id="network" xstyle="float: left">
+</div>
+
+<div xxxxstyle="float: right">
+<table>
+<tr><th>Package</th><td id="pkgName"></td></tr>
+<tr><th>Author</th><td id="pkgAuthor"></td></tr>
+<tr><th>Description</th><td id="pkgDescription"></td></tr>
+<tr><th>Imports</th><td id="pkgImports"></td></tr>
+<tr><th>Depends</th><td id="pkgDepends"></td></tr>
+</table>
+</div>  
+
+<script type="text/javascript">
+
+			//Width and height
+			var w = 800;
+			var h = 600;
+
+			//Initialize a default force layout, using the nodes and edges in dataset
+			var force = d3.layout.force()
+					 .nodes(dataset.nodes)
+					 .links(dataset.edges)
+					 .size([w, h])
+					 .linkDistance([50])
+					 .charge([-100])
+					 .start();
+
+			var colors = d3.scale.category10();  // 10 colors
+
+
+/* This function adds the <title> elements to the circles so that the tooltips work in Chrome. */
+function addTitles (selection)
+{
+    selection.each(function(data) {
+                     d3.select(this).append("title").text(data.name);
+                  })
+}
+
+			//Create SVG element
+			var svg = d3.select("#network")   // NOTICE the CHANGE
+    				    .append("svg")
+				    .attr("width", w)
+				    .attr("height", h);
+
+			
+			//Create edges as lines
+			var edges = svg.selectAll("line")
+				.data(dataset.edges)
+				.enter()
+				.append("line")
+				.style("stroke", "#ccc")
+				.style("stroke-width", 1);
+			
+			//Create nodes as circles
+			var nodes = svg.selectAll("circle")
+				.data(dataset.nodes)
+				.enter()
+				.append("circle")
+				.attr("r", 10)
+				.style("fill", function(d, i) {
+                                        if(d.author == "")
+       					   return colors(0);
+                                        else if(d.author.indexOf("Temple") > -1)
+       					   return colors(1);
+                                        else
+                                           return(colors(2));
+				})
+                                .attr("title", function(d, i) { return d.name ;}) // tooltip
+                                .on("click", function(d) { showPackageDetails(d.name) ;}) // event handler
+				.call(addTitles)
+                                .call(force.drag);
+
+			
+			//Every time the simulation "ticks", this will be called
+			force.on("tick", function() {
+
+				edges.attr("x1", function(d) { return d.source.x; })
+					 .attr("y1", function(d) { return d.source.y; })
+					 .attr("x2", function(d) { return d.target.x; })
+					 .attr("y2", function(d) { return d.target.y; });
+			
+				nodes.attr("cx", function(d) { return d.x; })
+    			             .attr("cy", function(d) { return d.y; });
+	
+			});
+		</script>
+
+
+
+<hr style="clear:both">
+<address><a href="http://www.stat.ucdavis.edu/~duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@r-project.org>&lt;duncan@r-project.org&gt;</a></address>
+<!-- hhmts start --> Last modified: Wed Nov 11 11:43:43 PST 2015 <!-- hhmts end -->
+</body> </html>

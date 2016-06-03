@@ -1,0 +1,714 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title></title>
+<link rel="stylesheet" href="Class.css"></link>
+</head>
+
+<body>
+<h1>Interactive Graphics with D3</h1>
+<center>
+Duncan Temple Lang
+<br/>
+Data Science Initiative, UC Davis <br/>
+Dept. of Statistics, UC Davis
+</center>
+
+<p>
+D3 basically uses SVG to create rich, interactive, animated visual displays.
+
+<p>
+SVG provides a lot of very powerful facilities.
+
+<p>
+We can create SVG via  an XML description, or programmatically via JavaScript.
+D3 does the latter.
+
+<p>
+We can create SVG directly in R using the svg() graphics device,
+or gridSVG().  But annotating the SVG elements created via the
+svg() device is not-entirely straightforward.
+Can use the SVGAnnotation package.
+
+<p>
+We could create the SVG elements directly in JavaScript.
+But D3 provides a framework that gives us enormous control
+but provides some assistance via a computational model.
+
+<p>
+We can also use D3 to create HTML elements in the DOM.
+
+<p>
+We have
+<ol>
+ <li>an HTML document,</lI>
+ <li>CSS for appearance and also layout</li>
+ <li>JavaScript code for creating the content and implementing event handlers</li>
+ <li>data as JavaScript objects, often serialized from R or another language as JSON</li>
+</ol>
+
+<p>
+We create the SVG elements programmatically.
+Suppose we want a collection of points as circles.
+We'll
+<ol>
+  <li>Create an SVG canvas</li>
+  <li>Create points and position them at x, y coordinates (directly and using a scale)</li>
+  <li>Color the points based on the value of a third variable</li>
+  <li>Add axes</li>
+  <li>Add a tooltip to each point</li>
+  <li>Add an event handler for each point</li>  
+</ol>
+
+Then we add transitions to an updated set of values.
+We also explore different layouts such as network displays and maps.
+
+
+<h4>The Data</h4>
+We'll use the simple mtcars data set.
+We serialize these data to JavaScript  with
+<pre>
+cat("var dataset =",
+     toJSON(cbind(mtcars[, c("mpg", "wt", "cyl", "hp")], type = rownames(mtcars)), byrow = TRUE, colNames = TRUE),
+    ";", file = "simpleData.json")
+</pre>
+
+
+<h2>Basic Skeleton</h2>
+We create an HTML document.
+It has a top-level html element,
+and within this both a head and body elements.
+
+<h3>The HEAD</h3>
+In the head, we load the d3 JavaScript code
+and also set the character encoding:
+<pre>
+&lt;meta charset="utf-8">
+&lt;script type="text/javascript" src="d3/d3.v3.js"></script>
+</pre>
+
+<p>
+We will also load data that we have written from R as JSON (JavaScript Object Notation) content.
+<pre>
+&lt;script type="text/javascript" src="simpleData.json"></script>
+</pre>
+
+<p>
+We can add a title that will appear in the browser's tab also:
+<pre>
+&lt;title>Simple Scatter Plot&lt;/title>
+</pre>
+
+
+<h3>The BODY</h3>
+The visible content of our document is quite simple
+and only contains an SVG canvas.
+We can create an SVG element either manually in the HTML document,
+or we can programmatically create with JavaScript.
+We'll do the latter .
+We create a &lt;script> element in the body and add the JavaScript
+code to that.
+<p>
+We use variables to store the height and width.
+<pre>
+var w = 600,
+    h = 500;
+</pre>
+
+Then comes the D3 idiom.
+We use the d3 object and call its select() method to get the
+&lt;body> element in the DOM.
+This returns an object and we then invoke its append() method
+to create a new HTML element named SVG.
+Then we set its width and  height:
+<pre>
+var svg = d3.select("body")
+            .append("svg")
+            .attr("width", w)
+            .attr("height", h);
+</pre>
+We have assigned the SVG element object to the JavaScript variable named
+<b>svg</b>.
+
+<p>
+Notice how D3 uses the chaining of commands.
+The methods typically return an object that we want to use in the next step,
+e.g., append() returns the new element and then we can set its attributes with .attr().
+
+<p>
+Next, we create the circles.
+This introduces the key D3 concept of a selection.
+"A selection is an array of elements pulled from the current document."
+D3 uses CSS3 selectors to identify the elements of interest.
+These include
+<ul>
+ <li> element name, e.g., p, body, div, a, img</li>
+ <li> class name, e.g., .className, div.plot</li>
+ <li> ids (identifiers), e.g., #idName</li>
+ <li> attribute value, e.g.  "[src='foo.png']"
+</ul>
+
+<p>
+We select all of the circle elements with
+<pre>
+d3.selectAll("circle")
+</pre>
+Curiously, there are no circles, so this returns an empty selection.
+But then we connect this selection with our data.
+This then causes the selection to recognize that there are fewer elements
+(0) than in the data set and it creates an internal collection of which elements
+will need to be created, specifically, one for each observation in the data set.
+<p>
+Next, we use the enter() method to apply code to each of these "new" elements.
+We do this with
+<pre>
+svg.selectAll("circle")
+    .data(dataset)
+    .enter()
+    .append("circle")
+    .attr("r", 4)
+    .attr("cx", function(d, i) {
+                   return( i * w/dataset.length + 5 );
+                })
+    .attr("cy", h/2)
+    .attr("fill", "red");
+</pre>
+Here we are creating a circle via <code>append("circle")</code>.
+This and the .attr() calls are applied to each of the elements
+in the selection.  These are the new elements created by the call to enter().
+We are specifying the cx and cy attributes to position each circle,
+and setting the radius and color to constants.
+
+<p>
+Note that because we are using D3 selections, we don't need explicit for() loops!
+This reminds us of R, but is due to very different reasons.
+
+<p>
+The interesting part is setting the cx attribute.
+This is different for each circle so we use a function to compute the
+value for each circle.
+The function needs the data, and in our simple case, the index of
+the observation.
+We define our function to take 2 parameters (d and i) and
+D3 passes the observation/row via d and  the index via i.
+
+
+<p>
+The result is visible in <a href="scatter1.html" >scatter1.html</a>.
+
+<h3>Positioning  the Points by Weight (wt) and Miles Per Gallon (mpg)</h3>
+
+The only part of the code we need to change is the computation of cx and cy.
+We might like to use
+<pre>
+    .attr("cx", function(d, i) {
+                   return d.wt;
+                })
+    .attr("cy", function(d) {
+                  return d.mpg;
+                })
+</pre>
+The code runs, but does not do what we want.
+These values are in units of 1000s of pounds and miles per (US) gallon.
+They are not values of pixels.
+So we have to transform them.
+This is relatively straightforward.
+For the horizontal values, we compute the minimum and maximum of wt.
+Then we create a linear mapping from this range to the width of the SVG canvas, <b>w</b>.
+<p>
+(We could have calculated the minimum and maximum in R and serialized that also. But we don't need
+to.)
+<p>
+D3 provides facilities for calculating the min and max:
+<pre>
+d3.min(dataset, function(d) d.wt)
+d3.max(dataset, function(d) d.wt)
+</pre>
+If dataset were a simple array, we wouldn't need the function.
+The function is to extract the relevant variable/column from each row.
+<p>
+So we could write the computations as
+<pre>
+var wt_range = [d3.min(dataset, function(d) d.wt), d3.max(dataset, function(d) d.wt)];
+var mpg_range = [d3.min(dataset, function(d) d.mpg), d3.max(dataset, function(d) d.mpg)];
+
+
+    .attr("cx", function(d, i) {
+                   return w*(d.wt - wt_range[0])/(wt_range[1] - wt_range[0]);
+                })
+    .attr("cy", function(d) {
+                   return h * (1 - (d.mpg - mpg_range[0])/(mpg_range[1] - mpg_range[0]));
+                })
+</pre>
+Note that for the vertical value, we do something slightly different.
+For us, as miles per gallons increase, the points will appear further up the window.
+However, computer graphics (SVG included) typically use 0,0 as the top left corner
+and increasing values go down the window!
+So larger values of would be further down the window.
+We want them to go the other way, corresponding to  a vertical axis starting at the bottom of the
+                   window.
+So we compute h*(1 - proportion along the scale)
+<p>
+
+The result is in <a href="scatter2.html" >scatter2.html</a>.
+
+<h3>Scales</h3>
+Instead of doing the computations manually, we can use scale objects in D3.
+This is not vital here, but it is useful generally. See projections for maps
+and also non-linear scales.
+They will also simplify creating axes for our plot.
+<p>
+We create a scale with d3.scale.linear(), using the ranges for the variables we computed above:
+<pre>
+var wtScale = d3.scale.linear().domain(wt_range).range([0, w]);  // make certain to put these into an array. not two arguments
+var mpgScale = d3.scale.linear().domain(mpg_range).range([h, 0]); 
+</pre>
+We specify the input and the output as domain and range,
+making certain to pass an array.
+Note that we made the mpgScale go from h to 0 rather than 0 to h.
+This ensures large values of mpg will be small in this new scale
+and so closer to the top of the window.
+<p>
+
+These scales are just computational devices; they don't show anything.
+We use them to calculate the values for the cx and cy attributes.
+d3.scale.linear() and friends return a function which we can call.
+So we set cx with
+<pre>
+ .attr("cx", function(d) {
+                return wtScale (d.wt) ;
+             })
+</pre>
+
+<p>
+See <a href="scatter3.html" >scatter3.html</a>
+
+<p>
+Note that a D3 scale has  several methods that make them more convenient
+and polished, e.g., nice, ticks, tickFormat.
+
+
+<p>
+We could add text to the plot at each circle using another D3 selection.
+We don't add the text to the circle elements.
+Instead, we loop over the observations again and create new &lt;text> elements, 
+e.g.,
+<pre>
+svg.selectAll("text")
+   .data(dataset)
+   .enter()
+   .append("text")
+   .text(function(d) {
+            // some label
+         })
+</pre>
+
+
+<h3>Axes</h3>
+The next step is to add horizontal and vertical axes.
+We use <code>d3.svg.axis()</code> to create an axis.
+We connect it to a scale object and then we use the d3 method call()
+to initialize the axis.
+It is also convenient to append the axis within a new &lt;g> element
+so that all the lines and labels are part of a single group.
+We can also then position that group, and hence all the elements in the axis,
+in a single transformation.
+We can do this with
+<pre>
+var wtAxis = d3.svg.axis()
+                  .scale(wtScale)
+                  .orient("bottom"); // where the labels appear
+
+    svg.append("g")
+       .attr("transform", "translate(0, " + (h - padding/2.0) + ")")
+       .call(wtAxis);
+</pre>
+The transform attribute is an SVG attribute that allows us to perform
+several different types of transformations.
+In this case, we move the group object 0 pixels in the horizontal direction,
+and h - padding/2 units down the canvas.
+
+<p>
+The wtAxis object is a function, again.
+The call(wtAxis) arranges to invoke the function with the current selection
+that comes from the earlier link in the chain.
+
+<p>
+The D3 axis object has methods to suggest the number of tick marks, compute the
+labels for the tick marks, etc.
+
+<p>
+The result is in <a href="scatter4.html" >scatter4.html</a>
+
+<p>
+The axis is not very pretty. We want to style it better.
+We can do this with CSS. We set the properties on the
+SVG elements. We need to identify these.
+We can use the developer tools and its inspector to find
+the class that D3 puts on the different elements,
+e.g. "tick major", "domain".
+<p>
+Alternatively, we can assume control and do this by adding an identifier or a class on the
+axis. We set this on the &lt;g> containing the axis,
+and the properties will be inherited by the children.
+So we can do this with
+<pre>
+svg.append("g")
+   .attr("class", "axis horizontal")
+   .attr("transform", "translate(0, " + (h - padding/2.0) + ")")
+   .call(wtAxis);
+</pre>
+<p>
+Then we can set the properties with
+<pre>
+.axis line, .axis path {
+  fill: none;
+  stroke: blue;
+}
+</pre>
+
+
+<p>
+Add a vertical axis to this plot in <a href="scatter4.html" >scatter4.html</a>
+
+<h3>Tooltips</h3>
+One approach to creating tooltips for elements in SVG is to add
+a title attribute to each &lt;circle>.
+We'll add the type of car as the tooltip:
+<pre>
+.attr("title", function(d) {
+                  return d.type;
+               });
+</pre>
+
+The result is in <a href="scatter5.html" >scatter5.html</a>.
+<p>
+There are other richer ways to create tooltips.
+
+
+
+
+<h3>Event Handlers</h3>
+Tooltips react to user interaction, but just pausing the pointer over an object.
+We also want to be able to provide more detailed interactions,
+e.g., clicking on an element, using keys, dragging an object.
+We can do this with the on() method for an object.
+Suppose we want to a click on a circle in the plot
+to display content about the observation in
+a separate part of the HTML document.
+We can do this with
+<pre>
+svg.selectAll("circle")
+    .data(dataset)
+    .enter()
+    .append("circle")
+    .on("click", function(d) {
+                   displayObservation(d)
+                 });
+</pre>
+This calls a (yet to be defined) function displayObservation()
+to add the contents of the observation to, e.g., a table.
+
+<p>
+We define this function as
+<pre>
+function displayObservation(obs)
+{
+
+    var el = document.getElementById('observation');
+    
+    var tbl =  '&lt;table>' +
+       '&lt;tr>&lt;th>Type&lt;/th>&lt;td>' + obs.type + '&lt;/td>&lt;/tr>' +
+       '&lt;tr>&lt;th>MPG&lt;/th>&lt;td>' + obs.mpg + '&lt;/td>&lt;/tr>' +
+       '&lt;tr>&lt;th>Weight&lt;/th>&lt;td>' + obs.wt + '&lt;/td>&lt;/tr>' +
+	'&lt;/table>';
+
+     el.innerHTML = tbl;
+}
+</pre>
+<p>
+For this to work,
+we create an empty &lt;div> element
+in our HTML document and give it an <b>id</b> attribute <i>observation</i>.
+
+
+<p>
+The result is in <a href="scatter6.html" >scatter6.html</a>.
+
+<p>
+The names of the common events are 
+click, mouseover, mouseout.
+However, there are other events and we and others can create new ones.
+For example, for the package network display, the force layout mechanism
+for the graph has a <i>tick</i> event.
+
+<p>
+The callback functions get the observation and the index as with our other
+functions in the selection.
+The function also has access to the element on which the event occurred
+via the <b>this</b> global variable.
+
+<p>
+Additionally, we can get the actual event object with <code>d3.event</code>.
+
+
+<h3>Coloring the Points</h3>
+We want to set a color on each circle corresponding to the horse power (hp)
+variable.
+We can use a D3 scale to map the value of hp to a color.
+We start by including another JavaScript file in the head of the HTML document:
+<pre>
+&lt;script type="text/javascript" src="d3-devel/lib/colorbrewer/colorbrewer.js"></script>
+</pre>
+This brings in several of Cyndy Brewer's  color palettes, the same as the RColorBrewer package in R.
+
+<p>
+In our JavaScript code, we create a scale to map hp to colors with
+<pre>
+var color = d3.scale.quantize()
+                .domain([d3.min(dataset, function(d) d.hp), d3.max(dataset, function(d) d.hp)])
+                .range(colorbrewer.RdBu[5]);
+</pre>
+RdBu is one of the color palettes.
+We specified the min and max for the horsepower and then the scale divides
+the output into equal width buckets corresponding to 5 different colors.
+<p>
+See - scales are useful!
+<p>
+
+<a href="scatter7.html" >scatter7.html</a>
+
+<p>
+Q: How would we add a legend?
+<p>
+Q:  Add the horse power to the tooltip.
+
+<h2>Observation and Debugging Developer Tools</h2>
+Browser's developer tools.
+
+<h2>CSV Files</h2>
+We serialized the data we have used in our examples
+from R directly into JavaScript Object Notation (JSON).
+Then we referenced that code with a &lt;script> element in
+the head (or the body) element of the HTML document.
+This meant that the dataset was immediately available to
+us in the form we expected.
+<p>
+In other cases, we may have the data in a CSV file or JSON file or whatever.
+In this case, we need JavaScript code to read the data from that file
+and transform it into a suitable form for us to use.
+D3 provides functions for read from common data formats:
+ d3.csv(), d3.json(), d3.xml(), d3.html()
+There is also a d3.xhr() function for making XML-HTTP requests to get results
+directly from a Web server.
+<p>
+The important aspect of using these functions is that they take time.
+We rarely put the code to read the data in the &lt;head> of the HTML document.
+Instead, we put it in the body.
+But as the JavaScript is reading the data, it blocks the processing of the rest of the page.
+This is undesirable.
+Instead, we use asynchronous loading.
+Basically, we say, "start retrieving and reading the data in one thread, but keep going with
+processing the document. Then, when you have all the data, do something with it".
+We do this by providing a "callback" function in the call to, e.g., d3.csv().
+<pre>
+d3.csv('data.csv', function(error, dataset) {
+                      // process the data, e.g., selectAll().data(dataset).enter()
+                   })
+</pre>
+We would put the <code>selectAll("elName").data(dataset).enter()</code>
+in this function as  that is when we have the data to bind to the elements.
+
+
+<h2>Changing the Data</h2>
+<p>
+When the values of the data change, we want to update the plot.
+We are not concerned with how the data change.
+This might be due to updating a frequency table or distribution
+with new data, the viewer interacting with the page and explicitly
+change the data. For now, we'll assume the number of observations stays the same.
+
+<p>
+Basically, when we change the data, we rebind it to the elements
+in almost the same way we did to create the elements using the
+<code>.data(dataset).enter().append("elName")...</code>.
+When we update the data, we don't call enter() and append().
+Instead, we just rebind the new values with
+<code>selection.data(dataset)</code>
+and then follow this by updating the attributes on the
+SVG elements based on the new values in the dataset,
+e.g., the cx and cy and fill values.
+<p>
+For example, suppose that the values in <b>dataset</b>
+have changed (or that we have a new dataset and assigned it to <b>dataset</b> but with the same
+number of elements).
+We can rebind the new dataset to the elements in the following manner for our
+scatterplot:
+<pre>
+ svg.selectAll("circle")
+      .data(dataset)
+      .attr("r", 4)
+      .attr("cx", function(d) {
+            return wtScale (d.wt) ;
+         })
+      .attr("cy", function(d) {
+            return mpgScale(d.mpg) ;
+         })
+</pre>
+This is the same code as we used before, but without the <code>.enter().append()</code>.
+Note that we may have to update the wtScale and mpgScale to
+change its domain appropriately.
+
+<h4>Transitions</h4>
+Smooth transitions when the data change (for whatever reason!)
+can help draw the viewers attention to particular features.
+D3 helps us with this via the transition() method
+and also the duration() method that controls how long the transition takes.
+Before we update the attributes, but just after we rebind the data,
+we can call transition() and that causes D3 to animate the change
+from previous value to the new value for each element.
+The only change to the code above is
+<pre>
+ svg.selectAll("circle")
+      .data(dataset)<font color="red">
+      .transition()
+      .duration(2000) // 1000 is the default, so this is slower</font>
+      .attr("r", 4)
+      .attr("cx", function(d) {
+            return wtScale (d.wt) ;
+         })
+      .attr("cy", function(d) {
+            return mpgScale(d.mpg) ;
+         })
+</pre>
+We added the calls to transition() and also duration().
+Duration controls how long the interval is.
+The default is 1000 milliseconds. We can increase or decrease this.
+The .ease() method controls the speed over the duration of the animation.
+By default, D3 starts slowly, speeds up, and the slows down for the end.
+There are several other schems.
+<p>
+We can speciy a delay for the transition via .delay().
+We would use a function for the argument to this in the usual way:
+<pre>
+.delay(function(d, i) { })
+</pre>
+This allows us to have a different delay for each observation/element.
+
+
+<p>
+Importantly, we have to update the axis, not just the scale.
+(The axis is the visible representation of the scale.)
+We can do this with
+<pre>
+  svg.select(".axis.horizontal").call(wtAxis);
+</pre>
+To do this, we needed to be able to select the &lt;g> element
+that contains the axis.  We can use the class we gave to it.
+
+<p>
+We can also animate the transition for colors.
+
+
+<p>
+If we need to update derived statistical results when the data
+change, we may need R's functionality.
+However, at viewing time, R is not present.
+We can do some compuations in JavaScript.
+However, this is where generally we want R around.
+Shiny or other approaches are useful here.
+See <a href="#DynComps" >Dynamic Computations</a>.
+
+
+<h3>Changing the Number of Observations</h3>
+
+
+<h2>Network Graph</h2>
+See <a href="packageGraph.html" >packageGraph.html</a>
+and
+<a href="packageGraph2.html" >packageGraph2.html</a>.
+<p>
+The first shows how to create a force layout network display.
+The second extends this.
+The data come from R packages installed on my computer and
+the relationships between which package imports another package.
+We compute this information via the code in <a href="pkgDepends.R" >pkgDepends.R</a>.
+This generates the data for the "graph" and other purposes in various different forms
+and also serializes these to JSON.
+
+<p>
+The second version color codes the nodes based on whether
+they have no author, Duncan as the author, or other.
+It also registers an event handler on the nodes so that
+when a viewer clicks on a node, we display information about that package in another
+part of the HTML document
+
+
+<p>
+Another example is a force-directed network showing
+which routines call which other routines in a C file,
+specifically R's src/main/memory.c.
+<a href="callGraph1.html" >Here's the display</a>.
+The nodes have tooltips to identify the routine.
+
+
+<p>
+Another way to view these dependencies is with a wheel-dependency.
+For example,
+<a href="packageDependency.html" >packageDependency.html</a>.
+This uses the DependencyWheel  code built on top of D3.
+The Git repository  is at <a href="https://github.com/fzaninotto/DependencyWheel.git" >https://github.com/fzaninotto/DependencyWheel.git</a>.
+
+
+<h2>Trees</h2>
+The following illustrates a hierarchical tree layout:
+<a href="XMLBookIncludes.html" >XMLBookIncludes.html</a>
+<p>
+There are also circular tree layouts.
+
+
+
+
+<h2>Maps</h2>
+There is a good 
+description of
+creating a reasonably involved map at <a href="http://bost.ocks.org/mike/map/"
+>http://bost.ocks.org/mike/map/</a>,
+written by D3's creator Mike Bostock.
+There are simpler examples in the <a href="http://bost.ocks.org/mike/map/" >git repository</a> for the book
+<i>Interactive Data Visualization for the Web</i>.
+
+<h2 ><a name="DynComps">Dynamic Computations</a></h2>
+Performing statistical computations at viewing time?
+No R.
+Shiny.
+But regular R plots will not be interactive.
+Have to generate interactive plots from R.
+Can do this. Or can get results back from R and then use these to draw in D3.
+
+
+<h2>R D3-Graphics Device</h2>
+Can we generate D3 code from R graphics?
+Yes, we can implement a graphics device
+like pdf(), svg(), png()
+that converts calls to create circles, lines, text, etc.
+into D3 code.
+See RD3Device and the RGraphicsDevice package generally.
+<p>
+Here <a href="showPlot.html" >is an example</a> of a simple output from R graphics
+rendered directly with D3.
+<p>
+This is similar to create SVG. We still have to annotate it.
+
+
+<h2>Glossary</h2>
+<dl>
+  <dt>
+    DOM
+  <dd> Document Object Model presented via the <b>document</b>  variable in JavaScript.
+
+<hr>
+<address><a href="http://www.stat.ucdavis.edu/~duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@r-project.org>&lt;duncan@r-project.org&gt;</a></address>
+<!-- hhmts start --> Last modified: Thu Jun  4 15:59:26 PDT 2015 <!-- hhmts end -->
+</body> </html>
+

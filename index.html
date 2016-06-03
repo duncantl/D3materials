@@ -1,0 +1,128 @@
+<html>
+<head>
+<link rel="stylesheet" href="OmegaTech.css"></link>
+<title>DSI: Introduction to D3, JavaScript, etc.</title>
+</head>
+<body>
+
+
+
+<h2>High-level D3 plots from R</h2>
+<ul>
+<li><a href="http://www.htmlwidgets.org/showcase_networkD3.html">htmlwidgets package</a></li>
+<li><a href="http://moderndata.plot.ly/interactive-r-visualizations-with-d3-ggplot2-rstudio/">Plotly</a></li>
+</ul>
+
+
+<h2>Sample Code</h2>
+
+<ul>
+<li><a href="D3.html" >D3 Introduction</a></li>
+<li><a href="svg.html" >svg.html - example of SVG</a>  and the <a href="svg.xml" >SVG file</a></li>
+
+<li><a href="scatterplot/scatter1.html" >scatter1.html</a> plot points on a line</li>
+<li><a href="scatterplot/scatter2.html" >scatter2.html</a> plot the points in 2 dimensions, manually computing the X and Y locations
+on the SVG display</li>
+<li><a href="scatterplot/scatter3.html" >scatter3.html</a> use D3 scale objects to map the data to X and Y locations</li>
+<li><a href="scatterplot/scatter4.html" >scatter4.html</a> add a horizontal axis to the plot using a D3 axis</li>
+<li><a href="scatterplot/scatter5.html" >scatter5.html</a> add a tooltip to each point in the pllot</li>
+<li><a href="scatterplot/scatter6.html" >scatter6.html</a> add an event handler for clicking on each point in the plot</li>
+<li><a href="scatterplot/scatter7.html" >scatter7.html</a> color each point according to a 3rd variable</li>
+<li><a href="scatterplot/scatter_transition.html" >scatter_transition.html</a> HTML button causes the scale and axis to change and
+    the observations to move gradually to the new locations.</li>
+</ul>
+
+
+<h4>Animation</h4>
+<li><a href="">Gap Minder scatterplot over time</a></li>
+
+<h4>Layouts</h4>
+<ul>
+<li><a href="dependencyWheel.html" >Package dependency wheel</a></li>
+<li><a href="packageGraph2.html" >Package dependency as network</a></li>
+<li><a href="sampleTree.html" >Simple tree layout</a></li>
+<li><a href="XMLBookIncludes.html" >Tree of files making up a book</a></li>
+</ul>
+
+<h4>Selections</h4>
+<li><a href="https://bl.ocks.org/mbostock/3808218">Selections - update, new/enter, remove example</a></li>
+
+
+<h4>Networks</h4>
+<li><a href="D3Eg/senateFisheye1.html">Fisheye lens on a network</a></li>
+
+<li>Discussion of how to adapt the network matrix</li>
+<li><a href="senateMatrix.html">Senate matrix</a></li>
+<li><a href="senateMatrixLinks.html">Senate matrix with hyperlinks</a></li>
+<li><a href="senateMatrixLinksColoredNames.html">Senate matrix with names colored</a></li>
+<li><a href="senateMatrixLinksGovtrackColredNames.html">Senate matrix with names colored</a></li>
+
+
+<h2>Resources</h2>
+
+
+<dl>
+<dt><li>Running a local Web Server</li></dt>
+<dd>
+<dl>
+<dt><li>Python</li>
+<dd>
+<pre>
+python -m SimpleHTTPServer &
+</pre>
+Then you can view files from this directory and its sub-directories in the Web browser
+via 
+<pre>
+http://localhost:8000/filename.html
+</pre>
+
+</dd>
+
+<dt><li>Node.js</li>
+<dd>
+<pre>
+http-server &
+</pre>
+Then you can view files from this directory and its sub-directories in the Web browser
+via 
+<pre>
+http://localhost:8080/filename.html
+</pre>
+<p>
+You first need to install http-server via
+<pre>
+npm install http-server -g
+</pre>
+and this requires npm to be installed as part of the <a href="https://nodejs.org">node</a> distribution.
+</p>
+</dd>
+
+
+</dl>
+
+<dl>
+<dt><li><a href="http://cdec.water.ca.gov/cgi-progs/stages/FNFSUM">D3 Reference Documentation</a></li></dt>
+<dd>
+</dd>
+
+<dt><li>So many Web pages and examples</li></dt>
+<dd>
+<ul>
+<li><a href="http://bl.ocks.org/mbostock">http://bl.ocks.org/mbostock</a></li>
+<li><a href="https://github.com/d3/d3/wiki/Gallery">https://github.com/d3/d3/wiki/Gallery</a></li>
+</ul>
+</dd>
+
+<dt><li>Books</li></dt>
+<dd>
+<ul>
+<li>Interactive Data Visualization for the Web, Scott Murray. O'Reilly.</li>
+<li>Data Visualization with D3.js Cookbook, Nick Qi Zhu, Packt Publishing.</li>
+<li>Mastering D3.js, Pablo Navarro Castillo, Packt Publishing</li>
+</ul>
+</dd>
+</dl>
+
+
+</body>
+</html>

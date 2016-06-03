@@ -1,0 +1,637 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Adapting the Co-Occurrence Matrix Display</title><link rel="stylesheet" type="text/css" href="../CSS/OmegaTech.css"></link><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"></meta><link xmlns="" rel="stylesheet" href="highlight/rhighlight.css">
+<script xmlns="" src="highlight/highlight.pack.js"></script>
+<script xmlns="">hljs.initHighlightingOnLoad();</script>
+</head><body class="yui-skin-sam"><div class="article" title="Adapting the Co-Occurrence Matrix Display"><div class="titlepage"><div><div><h2 class="title"><a id="idp140689923586400"></a>Adapting the Co-Occurrence Matrix Display</h2></div><div><div class="author"><h3 class="author"><span class="firstname">Duncan</span> <span class="surname">Temple Lang</span></h3><div class="affiliation"><span class="orgname">University of California at Davis<br></br></span> <span class="orgdiv">Department of Statistics<br></br></span></div></div></div></div><hr></hr></div><div class="section" title="Background &amp; Goals"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="idp140689954972544"></a>Background &amp; Goals</h2></div></div></div><p>
+We explored in <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="proglang">R</b> how we can use a rectangular/square matrix display to present the adjacency matrix.
+We looked at the co-sponsorship graph for <a class="ulink" href="senate15.pdf" target="_top">the current senate</a>.  We also looked at 
+the last <a class="ulink" href="senate15.pdf" target="_top">15 senates</a>, and we also have the same information for the House.
+In these plots, the order of the rows &amp; columns is important to display different features.
+We can animate the change of rows and columns and we can also make the display  interactive.
+This discusses how we took the original example of the co-occurrences of characters  in
+Les Miserables from Mike Bostock at <a class="ulink" href="http://bost.ocks.org/mike/miserables/ " target="_top">http://bost.ocks.org/mike/miserables/ </a>
+and added features to it.
+</p><p>
+The following are the features we might like to add:
+</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Hyperlinks to the people's names</p></li><li class="listitem"><p>link the hyperlinks to the govtrack_id's</p></li><li class="listitem"><p>color the names by party</p></li><li class="listitem"><p>tooltips for the rectangles in the matrix to give counts</p></li><li class="listitem"><p>click on a rectangle in the matrix to get a list of the co-sponsored bills</p></li><li class="listitem"><p>click on the rectangle and higlight all the senators that the person co-sponsored a bill with.</p></li></ul></div><p>
+
+</p><div class="section" title="Creating the Initial Plot"><div class="titlepage"><div><div><h3 class="title"><a id="idp140689961225232"></a>Creating the Initial Plot</h3></div></div></div><p>
+Firstly, we started with the adjacency matrix.
+We computed this with the code in <a class="ulink" href="senate1.R" target="_top">senate1.R</a>
+and <a class="ulink" href="funs.R" target="_top">funs.R</a>. The raw data are in <a class="ulink" href="Congress113.zip" target="_top">Congress113.zip</a>
+and data from the other congress are available from <a class="ulink" href="http://govtrack.us" target="_top">http://govtrack.us</a>
+or me.
+The simplest thing is to load <a class="ulink" href="15Sessions.rda" target="_top">the RDA file with the 30 matrices</a>
+(15 for each of the House and Senate).
+</p><p>
+The original and annotaed HTML file from Mike Bostock's example is 
+<a class="ulink" href="orginalMatrix.html" target="_top">orginalMatrix.html</a>.  It is shown below.
+I've removed the text and other less important details only to simplify understanding
+the document.
+</p><p>
+The data for the matrix is loaded via the call
+</p><pre class="programlisting">
+d3.json("miserables.json", function(miserables) {
+     .....
+ })
+</pre><p>
+The body of this function definition makes up most of the code to create the plot
+and indeed the <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="progLang">HTML</b> document.
+</p><p>
+We change the name of the file that contains the data for our network to
+<code xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:c="http://www.C.org" xmlns:python="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:statdocs="http://www.statdocs.org" xmlns:gtk="http://www.gtk.org" xmlns:com="http://www.microsoft.com" xmlns:sh="http://www.shell.org" xmlns="" class="file">senateMatrix.json</code> and we create this in <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="proglang">R</b> from our matrix representing the network.
+We create this with 
+</p><div xmlns="" class="codeToggle"><div class="unhidden" id="idp140689961232096"><div><pre class="rcode" title="R code">
+cat(jsonlite::toJSON( list(nodes = Nodes, links = Links)), file = "senateMatrix.json")
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<p>
+or 
+</p><div xmlns="" class="codeToggle"><div class="unhidden" id="idp140689961232576"><div><pre class="rcode" title="R code">
+cat(RJSONIO::toJSON( list(nodes = Nodes, links = Links)), file = "senateMatrix.json", byrow = TRUE)
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<p>
+But before this, we have to create the variable <b xmlns="" class="S" title="">Nodes</b> and <b xmlns="" class="S" title="">Links</b>.
+We do this with the code in <a class="ulink" href="senate1.R" target="_top">senate1.R</a>.
+This looks lengthy, yet we used this same data for numerous plots.
+We start by loading the data and obtaining the matrix for the
+current senate: 
+</p><div xmlns="" class="codeToggle"><div class="unhidden" id="idp140689961234672"><div><pre class="rcode" title="R code">
+print(load("15Sessions.rda"))
+sen = ms[[length(ms)]]  # the final/current congress
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<p>
+To simplify our network and focus on the most important elements within it,
+we only consider links where there are 31 or more co-sponsored bills between 
+a pair of senators as constituting a link:
+</p><div xmlns="" class="codeToggle"><div class="unhidden" id="idp140689961235360"><div><pre class="rcode" title="R code">
+Threshold = 30
+m = sen &gt; Threshold
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<p>
+This creates a binary (0/1) matrix.
+</p><p>
+Our <b xmlns="" class="S" title="">Links</b> variable is a data frame consisting 
+of the source, target pairs for our edges and these should be 
+indices into the set of nodes. To do this, we first turn 
+our adjacency matrix into an edge list using <i xmlns:r="http://www.r-project.org" xmlns:c="http://www.C.org" xmlns=""><a href="http://cran.r-project.org/web/packages/igraph/index.html">igraph</a></i>:
+</p><div xmlns="" class="codeToggle"><div class="unhidden" id="idp140689961237040"><div><pre class="rcode" title="R code">
+library(igraph)
+el = as_edgelist(graph.adjacency(m))
+el = as.data.frame(el, stringsAsFactors = FALSE)
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<p>
+The first few rows of these are 
+</p><div xmlns="" class="codeToggle"><div class="unhidden" id="idp140689961237536"><div><pre class="rcode" title="R code">
+head(el)
+<pre class="routput">
+      V1     V2
+1 412494 412493
+2 412494 412251
+3 412494 400034
+4 412494 400040
+5 412494 400061
+6 412494 300023
+</pre>
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<p>
+These strings are the govtrack identifiers for the senators.
+We can look these up in the <b xmlns="" class="S" title="">people</b> data frame.
+</p><p>
+We have to match these source and target pairs to the nodes.
+We can do this with 
+</p><div xmlns="" class="codeToggle"><div class="unhidden" id="idp140689961239392"><div><pre class="rcode" title="R code">
+ids = colnames(m)
+Links = data.frame(source = match(el[,1], ids) - 1L,
+                   target = match(el[,2], ids) - 1L)
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<p>
+We have subtracted 1 from each of the these indices since these are for <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="proglang">JavaScript</b> and  they should be 0-based.
+</p><p>
+In addition to just the source and target for each link, we want information about the link.
+We'll add the number of bills (co-)sponsored by these two senators together. This comes 
+from the original non-thresholded matrix <b xmlns="" class="S" title="">sen</b>.
+We can get these with
+</p><div xmlns="" class="codeToggle"><div class="unhidden" id="idp140689961241376"><div><pre class="rcode" title="R code">
+counts = sen[ as.matrix(el) ]
+Links$value = as.integer(cut(counts, quantile(counts, c(0, .2, .4, .6, .8, 1))))
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<p>
+This puts the counts into different groups/categories based on the distribution, specifically quintiles, of these counts.
+</p><p>
+We next need the <b xmlns="" class="S" title="">Nodes</b> data frame.
+For each node, we want the <b xmlns="" class="S" title="">name</b>, <b xmlns="" class="S" title="">group</b> (with which party the senator is affiliated),
+and also the number of bills s/he has (co-)sponsored.
+We obtain this with 
+</p><div xmlns="" class="codeToggle"><div class="unhidden" id="idp140689961243680"><div><pre class="rcode" title="R code">
+i = match(ids, people$govtrack_id)
+Nodes = data.frame(name = paste(people[i, "first_name"], people[i, "last_name"]),
+                   group = as.integer(factor(people[i,"party"])),
+                   size = rowSums(m[ids, ids]))
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<p>
+</p><p>
+To create our <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="acronym" title="JavaScript Object Notation"><b class="proglang">JSON</b></b> (JavaScript Object Notation) file, we put these two variables together in a <b xmlns:r="http://www.r-project.org" xmlns:c="http://www.C.org" xmlns="" class="rkeyword">list</b>
+and output it as <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="acronym" title="JavaScript Object Notation"><b class="proglang">JSON</b></b> (JavaScript Object Notation) with, e.g.,
+</p><div xmlns="" class="codeToggle"><div class="unhidden" id="idp140689961246416"><div><pre class="rcode" title="R code">
+cat(jsonlite::toJSON( list(nodes = Nodes, links = Links)), file = "senateMatrix.json")
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<p>
+</p><p>
+Now we have the data in the same format that the <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="proglang">JavaScript</b> code expects.
+And we should note that this is the format for numerous plots, including
+the <i xmlns:r="http://www.r-project.org" xmlns:c="http://www.C.org" xmlns=""><a href="http://cran.r-project.org/web/packages/networkD3/index.html">networkD3</a></i> package and its <i xmlns:r="http://www.r-project.org" xmlns:c="http://www.C.org" xmlns="" class="rfunc">forceNetwork()</i> function.
+So we would have to do this for most of the plots we want to create, and we can use
+it across several different renderings without changing the <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="acronym" title="JavaScript Object Notation"><b class="proglang">JSON</b></b> (JavaScript Object Notation) content.
+</p></div><div class="section" title="Understanding the HTML Document"><div class="titlepage"><div><div><h3 class="title"><a id="idp140689961249744"></a>Understanding the <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="progLang">HTML</b> Document</h3></div></div></div><p>
+An annotated version of the original document is here
+</p><pre class="programlisting">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;meta charset="utf-8"&gt;
+&lt;script src="//d3js.org/d3.v2.min.js" charset="utf-8"&gt;&lt;/script&gt;
+
+&lt;aside style="margin-top:80px;"&gt;
+&lt;p&gt;Order: &lt;select id="order"&gt;
+  &lt;option value="name"&gt;by Name&lt;/option&gt;
+  &lt;option value="count"&gt;by Frequency&lt;/option&gt;
+  &lt;option value="group"&gt;by Cluster&lt;/option&gt;
+&lt;/select&gt;
+&lt;/aside&gt;
+
+&lt;script&gt;
+var margin = {top: 80, right: 0, bottom: 10, left: 80},
+    width = 720,
+    height = 720;
+
+var x = d3.scale.ordinal().rangeBands([0, width]),
+    z = d3.scale.linear().domain([0, 4]).clamp(true),
+    c = d3.scale.category10().domain(d3.range(10));
+
+/* Create the SVG drawing area (&lt;svg&gt;) and position based on the values in margin.
+   We add a &lt;g&gt; element as the sole child of &lt;svg&gt; element. This is where
+   we will add the text for the row and column labels and the rows. */
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .style("margin-left", -margin.left + "px")
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+/* Read the data for the nodes and edges and create the matrix display.
+   The function passed as the second argument is called after the
+   data has been (downloaded if necessary) and read into memory.
+   As such, it is ansynchronous call. This means
+   other code within this &lt;script&gt; element cannot use variables
+   or objects it creates because the code in the function
+   won't have been run yet.
+*/
+
+d3.json("miserables.json", function(miserables) {
+  var matrix = [],
+      nodes = miserables.nodes,
+      n = nodes.length;
+
+  // Compute index per node.
+  nodes.forEach(function(node, i) {
+    node.index = i;
+    node.count = 0;
+    matrix[i] = d3.range(n).map(function(j) { return {x: j, y: i, z: 0}; });
+  });
+
+  // Convert links to matrix; count character occurrences.
+  miserables.links.forEach(function(link) {
+    matrix[link.source][link.target].z += link.value;
+    matrix[link.target][link.source].z += link.value;
+    matrix[link.source][link.source].z += link.value;
+    matrix[link.target][link.target].z += link.value;
+    nodes[link.source].count += link.value;
+    nodes[link.target].count += link.value;
+  });
+
+  // Precompute the orders.
+  // These are for the ordering by Frequency, by Name, by Cluster
+  var orders = {
+    name: d3.range(n).sort(function(a, b) { return d3.ascending(nodes[a].name, nodes[b].name); }),
+    count: d3.range(n).sort(function(a, b) { return nodes[b].count - nodes[a].count; }),
+    group: d3.range(n).sort(function(a, b) { return nodes[b].group - nodes[a].group; })
+  };
+
+  // The default sort order.
+  x.domain(orders.name);
+
+    // Create the background rectangle thhat covers the entire &lt;svg&gt; element.
+  svg.append("rect")
+      .attr("class", "background")
+      .attr("width", width)
+      .attr("height", height);
+
+    /*  now we are ready to create the rows of the matrix
+        We select the .row objects (by class) which don't exist yet, and then bind the data to
+        and iterate to create a &lt;g&gt; and the sequence of &lt;rect&gt; elements
+        and then the &lt;text&gt; for the row label
+        The looping here happens after the call to enter(), but the majority of the work
+        is done in the function named row (not to be confused with the variable named row
+        that we create here.
+        Note that the data we bind is the matrix.  This is an array
+        of rows. Each row is also an array.
+        Note that we create the g for housing the &lt;rect&gt;, &lt;text&gt; and &lt;line&gt;
+        elements. By positioning it (via a transform attribue), the children
+        can be specified relative to &lt;g&gt; and hence not transformed themselves. */
+  var row = svg.selectAll(".row")
+      .data(matrix)
+      .enter()
+      .append("g")
+      .attr("class", "row")
+      .attr("transform", function(d, i) { return "translate(0," + x(i) + ")"; })
+      .each(row);  // So this calls the row function below for each of the rows in the matrix.
+
+     // Draw a line under all the &lt;rect&gt; elements, i.e. separating this &lt;g&gt; from the next row's &lt;g&gt;
+  row.append("line")
+      .attr("x2", width);
+
+     /* Put the row names on the left of the row. These will be the last elements in the &lt;g&gt;
+        for the row, but we specify the x location so it the position in the tree is not important. */
+  row.append("text")
+      .attr("x", -6)
+      .attr("y", x.rangeBand() / 2)
+      .attr("dy", ".32em")
+      .attr("text-anchor", "end")
+      .text(function(d, i) { return nodes[i].name; });
+
+
+       /*  This is the row() function that we arranged to call to build the &lt;rect&gt; for
+           each cell in this row of the matrix.
+           The function starts by selecting the newly created DOM element, namely the &lt;g&gt; for this
+           row. Then it creates the selection for the soon to be created cells and iterates over
+           them  and the data to create the &lt;rect&gt; elements. What are the data here?
+           It is a row of the matrix
+         */
+  function row(row) {
+    var cell = d3.select(this).selectAll(".cell")
+        .data()                    /* row.filter(function(d) { return d.z; }) */
+        .enter()
+        .append("rect")
+        .attr("class", "cell")
+        .attr("x", function(d) { return x(d.x); })
+        .attr("width", x.rangeBand())   // this is the x created at the top of the script, (not the
+                                        // x attribute created in the line above.
+        .attr("height", x.rangeBand())
+        .style("fill-opacity", function(d) { return z(d.z); })
+             // set the color based on the row's group
+        .style("fill", function(d) { return nodes[d.x].group == nodes[d.y].group ?  c(nodes[d.x].group) : null; })
+             // set event handlers
+        .on("mouseover", mouseover)  
+        .on("mouseout", mouseout);
+  }
+
+
+      /* Next create the &lt;g&gt; elements for the columns. These will span the entire height
+         of the matrix. This allows us to have events on the row and column to highlight
+         the names of the two senators when mouse over a cell.
+         The next three statements work with the column selection and create the &lt;g&gt;
+         then then &lt;line&gt; separating the columns and then the &lt;text&gt; for the column
+         label.
+        */
+  var column = svg.selectAll(".column")
+      .data(matrix)
+      .enter()
+      .append("g")
+      .attr("class", "column")
+      .attr("transform", function(d, i) { return "translate(" + x(i) + ")rotate(-90)"; });
+
+  column.append("line")
+      .attr("x1", -width);
+
+  column.append("text")
+      .attr("x", 6)
+      .attr("y", x.rangeBand() / 2)
+      .attr("dy", ".32em")
+      .attr("text-anchor", "start")
+      .text(function(d, i) { return nodes[i].name; });
+
+
+  function mouseover(p) {
+    d3.selectAll(".row text").classed("active", function(d, i) { return i == p.y; });
+    d3.selectAll(".column text").classed("active", function(d, i) { return i == p.x; });
+  }
+
+  function mouseout() {
+    d3.selectAll("text").classed("active", false);
+  }
+
+
+    /* Set the event handler for the HTML pull-down menu.*/
+
+  d3.select("#order").on("change", function() {
+    clearTimeout(timeout);
+    order(this.value);  // call this with the newly selected value from the pulldown menu.
+  });
+
+
+     /* This arranges to reorder the rows and columns to  show the new display. */
+  function order(value) {
+    x.domain(orders[value]);
+
+        // create an animation/transition to show the rows and columns moving.
+    var t = svg.transition().duration(2500);
+
+       // move the rows and columns simultaneously.
+
+    t.selectAll(".row")
+        .delay(function(d, i) { return x(i) * 4; })
+        .attr("transform", function(d, i) { return "translate(0," + x(i) + ")"; })
+        .selectAll(".cell")
+        .delay(function(d) { return x(d.x) * 4; })
+        .attr("x", function(d) { return x(d.x); });
+
+    t.selectAll(".column")
+        .delay(function(d, i) { return x(i) * 4; })
+        .attr("transform", function(d, i) { return "translate(" + x(i) + ")rotate(-90)"; });
+  }
+
+    /* This arranges to change to the by Cluster view after 5 seconds from when the page is displayed.*/
+  var timeout = setTimeout(function() {
+                             order("group");
+                             d3.select("#order").property("selectedIndex", 2).node().focus();
+                           }, 5000);
+});
+&lt;/script&gt;
+
+
+
+
+
+</pre><p>
+</p><p>
+Firstly, there is a pull-down menu with three options: by Name, by Frequency and by Cluster.
+When the viewer changes this, the matrix reorganizes itself. 
+This involves having the <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="progLang">HTML</b> content change the plot.
+So there is some interaction between two quite different elements of the overall page - the text and the plot.
+</p><p>
+There is no explicit event handler for this. However, near the bottom of the
+in-lined <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="proglang">JavaScript</b> code we have
+</p><pre xmlns:xd="http://www.xsldoc.org" xmlns="" class="programlisting_js">
+ d3.select("#order").on("change", function() {
+   clearTimeout(timeout);
+   order(this.value);
+ });
+</pre>
+<p>
+This queries the <code xmlns="" class="xmlTag">&lt;select&gt;</code> element by its <code xmlns="" class="xmlAttribute">id</code> attribute
+and adds an event handler for any changes made to it.
+The handler calls the <code xmlns="" class="jsFunc">order</code> function.
+</p><p>
+We don't have to change this code for the pull-down menu as it continues to do exactly what we want with our new data.
+It is independent of the actual data content.
+</p></div><div class="section" title="Adding Hyperlinks to the People's Names"><div class="titlepage"><div><div><h3 class="title"><a id="idp140689961256096"></a>Adding Hyperlinks to the People's Names</h3></div></div></div><p>
+To add hyperlinks to the row labels (i.e. the names of the senators appearing
+for each row), we can adapt the <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="proglang">JavaScript</b> code
+</p><pre xmlns="" class="javascript">
+  row.append("text")
+      .attr("x", -6)
+      .attr("y", x.rangeBand() / 2)
+      .attr("dy", ".32em")
+      .attr("text-anchor", "end")
+      .text(function(d, i) { return nodes[i].name; });
+</pre>
+<p>
+
+Instead of <code xmlns="" class="xmlTag">&lt;text&gt;</code> elements, we want to create
+<code xmlns="" class="xmlTag">&lt;a&gt;</code> elements for a hyperlink and within this have
+the <code xmlns="" class="xmlTag">&lt;text&gt;</code> element.
+For the <code xmlns="" class="xmlTag">&lt;a&gt;</code> element, we add a <code xmlns="" class="xmlAttribute">href</code>
+attribute to specify the destination of the hyperlink.
+For <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="proglang">SVG</b> we actually use  <code xmlns="" class="xmlAttribute">xlink:href</code> and
+not the simple <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="progLang">HTML</b> <code xmlns="" class="xmlAttribute">href</code> attribute.
+We can do this with the following change to the code above
+
+</p><pre xmlns="" class="javascript">
+   row<code class="highlight">.append("a")
+     .attr("xlink:href", function(d, i) { return nodes[i].name; })</code>
+      .append("text")
+      .attr("x", -6)
+      .attr("y", x.rangeBand() / 2)
+      .attr("dy", ".32em")
+      .attr("text-anchor", "end")
+      .text(function(d, i) { return nodes[i].name; });
+</pre>
+<p>
+</p><p>
+This makes the text clickable. Unfortunately, the link is wrong. The person's
+name does not bring us to a proper Web page.
+Instead, we need to map this to a page on <a class="ulink" href="govtrack.us" target="_top">govtrack.us</a> for example.
+Here, there is a page for each senator using the template URL
+</p><pre class="programlisting">
+http://govtrack.us/congress/members/firstName_lastName/govtrack_id
+</pre><p>
+The govtrack_id
+We can have the <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="proglang">JavaScript</b> code create these URLs dynamically, or alternatively
+we could create them in <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="proglang">R</b> and store them in each node. (Or we can do both!)
+For the former, we need the govtrack_id for each node. So
+when we create the data frames in <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="proglang">R</b> to export to <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="acronym" title="JavaScript Object Notation"><b class="proglang">JSON</b></b> (JavaScript Object Notation), we add this as a column
+in the <b xmlns="" class="S" title="">Nodes</b> data frame.
+This is as simple as 
+</p><div xmlns="" class="codeToggle"><div class="unhidden" id="idp140689961266944"><div><pre class="rcode" title="R code">
+Nodes$govtrack_id = people$govtrack_id[i]
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<p>
+since <b xmlns="" class="S" title="">i</b> was the vector of indices matching these 100 senators.
+Similarly, we could add the URLs with
+</p><div xmlns="" class="codeToggle"><div class="unhidden" id="idp140689961267856"><div><pre class="rcode" title="R code">
+Nodes$url = sprintf("http://govtrack.us/congress/members/%s_%s/%s", 
+                                   tolower(people$first_name[i]), 
+                                   tolower(people$last_name[i]),
+                                   people$govtrack_id[i])
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<p>
+</p><p>
+We change our <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="proglang">JavaScript</b> code above to 
+</p><pre class="programlisting">
+   row.append("a")
+     &lt;highlight&gt;.attr("xlink:href", function(d, i) { return makeGovLinkURL(nodes[i]) })&lt;/highlight&gt;
+     .append("text")
+</pre><p>
+The function <code xmlns="" class="jsFunc">makeGovLinkURL</code> creates the URL, taking care to convert the name
+to lower case and replacing a space with a _.
+This code is in <a class="ulink" href="senateMatrixLinksGovtrackColoredNames.html" target="_top">senateMatrixLinksGovtrackColoredNames.html</a> and here:
+</p><pre xmlns="" class="javascript">
+/* Create the GovTrack.us link for this member of congress. */
+function makeGovLinkURL(node)
+{
+   return "http://govtrack.us/congress/members/" +  mkName(node.name) + "/" + node.govtrack_id;
+}
+
+function mkName(name)
+{
+  return( name.replace(" ", "_").toLowerCase() ) ;
+}
+</pre>
+<p>
+</p><p>
+We do the same for the column labels, changing the code
+</p><pre xmlns="" class="javascript">
+column.append("text")
+      .attr("x", 6)
+</pre>
+<p>
+to
+</p><pre xmlns="" class="javascript">
+column<code class="highlight">.append("a")
+     .attr("xlink:href", function(d, i) { return makeGovLinkURL(nodes[i]) })</code>  
+      .append("text")
+</pre>
+<p>
+</p></div><div class="section" title="Changing the Colors of the Row and Column Labels"><div class="titlepage"><div><div><h3 class="title"><a id="idp140689961273632"></a>Changing the Colors of the Row and Column Labels</h3></div></div></div><p>
+The goal here is to use the party affiliation to color senators names.
+We can do this in various ways. We'll chose to use <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="progLang">CSS</b>.
+The names are within <code xmlns="" class="xmlTag">&lt;text&gt;</code> elements.
+When we create these elements, we'll set the class to be
+Democrat, Republican or Independent.
+We do this with the following one expression addition (highlighted)
+</p><pre xmlns="" class="javascript">
+  row.append("a")
+      .attr("xlink:href", function(d, i) { return makeGovLinkURL(nodes[i]) })
+      .append("text")
+      .attr("x", -6)
+      .attr("y", x.rangeBand() / 2)
+      .attr("dy", ".32em")
+      .attr("text-anchor", "end")
+     <code class="highlight">.attr("class", function(d, i) { return nodes[i].party;  } )</code>
+      .text(function(d, i) { return nodes[i].name; });
+</pre>
+<p>
+This extracts the party field for each node and uses that as the name of the class.
+We didn't yet add that to each node in our <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="acronym" title="JavaScript Object Notation"><b class="proglang">JSON</b></b> (JavaScript Object Notation) data, but we do so easily in <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="proglang">R</b>
+with 
+</p><div xmlns="" class="codeToggle"><div class="unhidden" id="idp140689961277952"><div><pre class="rcode" title="R code">
+Nodes$party = people[i, "party"]
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<p>
+and the export <b xmlns="" class="S" title="">Nodes</b> and <b xmlns="" class="S" title="">Links</b> to <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="acronym" title="JavaScript Object Notation"><b class="proglang">JSON</b></b> (JavaScript Object Notation) as 
+we did above.
+</p><p>
+Setting the class does not change the color of the labels.
+We also have to add directives for this which we do in <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="progLang">CSS</b> in the <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="progLang">HTML</b> document
+with 
+</p><pre class="programlisting">
+text.Democrat {
+   fill: blue;
+}
+
+text.Republican {
+   fill: red;
+}
+
+text.Independent {
+   fill: green;
+}
+</pre><p>
+We put these in the <code xmlns="" class="xmlTag">&lt;style&gt;</code> element in the <code xmlns="" class="xmlTag">&lt;head&gt;</code> of the <code xmlns="" class="xmlTag">&lt;html&gt;</code> document.
+</p><p>
+The results are visible in <a class="ulink" href="senateMatrixLinksGovtrackColoredNames.html" target="_top">senateMatrixLinksGovtrackColoredNames.html</a>.
+</p></div><div class="section" title="Adding Tooltips to the &lt;rect&gt; Elements"><div class="titlepage"><div><div><h3 class="title"><a id="idp140689961283728"></a>Adding Tooltips to the <code xmlns="" class="xmlTag">&lt;rect&gt;</code> Elements</h3></div></div></div><p>
+It would be convenient to be able to mouse over a cell in the matrix and
+hover long enough so that a tooltip appears telling us the names of the two
+senators for that cell (the row and column labels) and the number of 
+co-sponsored bills they appeared on.
+</p><p>
+Creating tooltips is different for different browsers.
+For Firefox, we can just add a <code xmlns="" class="xmlAttribute">title</code> attribute to an element.
+For Google Chrome, we have to add a <code xmlns="" class="xmlTag">&lt;title&gt;</code> element as a child of the
+element, e.g., of each <code xmlns="" class="xmlTag">&lt;rect&gt;</code>.
+</p><p>
+
+</p><pre xmlns="" class="jsFunctionDef">
+function row(row, rowNum) {
+   var cell = d3.select(this)
+                .selectAll(".cell")
+                .data()
+                .enter()
+                .append("rect")
+                .attr("class", "cell")
+                   ....
+              <code class="highlight">.each(function(d, i) { return addTooltip(d3.select(this), i, rowNum) ; });</code>
+</pre>
+<p>
+This just calls <code xmlns="" class="jsFunc">each</code> with a function that takes both the data 
+and the column number. We modified the <code xmlns="" class="jsFunc">row</code> function to also receive the row number
+which we need to identify the row and column for the cell and hence look up both labels and the count.
+We call the <code xmlns="" class="jsFunc">addTooltip</code> we also added to create the <code xmlns="" class="xmlTag">&lt;title&gt;</code> element
+with the relevant text for the tooltip. It computes the latter via the row and column numbers.
+However, that function also needs to know to which DOM element to append the new <code xmlns="" class="xmlTag">&lt;title&gt;</code> element.
+So we pass it the newly created <code xmlns="" class="xmlTag">&lt;rect&gt;</code> element. We get this via the call
+</p><pre xmlns="" class="javascript">
+d3.select(this)
+</pre>
+<p>
+See Mastering D3.js p25.
+</p><p>
+The <code xmlns="" class="jsFunc">addTooltip</code> function is defined as 
+</p><pre xmlns="" class="javascript">
+function addTooltip(obj, i, j) {
+   obj.append("title").text( nodes[j].name + " " + nodes[i].name + ": " + matrix[j][i].z);
+   return obj;
+}
+</pre>
+<p>
+</p><p>
+The original matrix display by Mike Bostock had a filter  for the cells in a row of the matrix.
+The code for the <code xmlns="" class="jsFunc">row</code> function started with
+</p><pre xmlns="" class="jsFunctionDef">
+function row(row) {
+    var cell = d3.select(this).selectAll(".cell")
+        .data(row.filter(function(d) { return d.z; }))
+        .enter()
+         ...
+</pre>
+<p>
+This was sensible as it does not create a <code xmlns="" class="xmlTag">&lt;rect&gt;</code> for any cell in the matrix
+with a count of 0. 
+Unfortunately, this means that the column numbers do not correspond  to the array of senators.
+For example, if the second cell of a row in the matrix is 0, then that cell is discarded.
+The first rectangle created corresponds to the first senator, but the second rectangle
+corresponds to the third senator. 
+To avoid this and ensure that we can map to the relevant senator, we do not filter any of the 0-count cells.
+Alternatively, we could put the index into the node itself so we could look at it (in the variable <b xmlns="" class="S" title="">d</b>)
+and get the index of the corresponding senator.
+</p></div><div class="section" title="Clicking on a Cell"><div class="titlepage"><div><div><h3 class="title"><a id="idp140689961296208"></a>Clicking on a Cell</h3></div></div></div><p>
+To add the ability to click on a cell in the matrix and have an action occur,
+we need to add an event handler for the click event for each rectangle.
+We'll need the row and column indices for the cell.
+This is basically what we did for the tooltip, but simpler as we are not adding a new element.
+So we can add this to our <code xmlns="" class="jsFunc">row</code> function with the following line
+</p><pre xmlns="" class="javascript">
+  function row(row, rowNum) {
+    var cell = d3.select(this).selectAll(".cell")
+        .data()
+        .enter()
+        .append("rect")
+         ....
+        .on("mouseover", mouseover)
+        .on("mouseout", mouseout)
+       <code class="highlight">.on("click",  function(val, i) { return clickCell(val, i, rowNum) })</code>
+        .each(function(d, i) { return addTooltip(d3.select(this), i, rowNum) ; });
+</pre>
+<p>
+This adds the event handler using the <code xmlns="" class="jsFunc">on</code> method.
+The function takes the value of the data object (our matrix cell)
+and the column number since that is what we are looping over here.
+We also get the row number from the <code xmlns="" class="jsFunc">row</code> function and then
+we pass these to our actual event handler function which we call <code xmlns="" class="jsFunc">clickCell</code>.
+This can do whatever it wants such as adding content to another part of the <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="progLang">HTML</b> document.
+</p></div></div></div></body></html>

@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Simple Scatter Plot</title>
+<meta charset="utf-8">
+<script type="text/javascript" src="d3/d3.v3.js"></script>
+
+<script type="text/javascript" src="simpleData.json"></script>
+</head>
+
+<body>
+<h1></h1>
+
+
+We compute the mapping from the data values to pixel locations manually.
+<script type="text/javascript">
+var w = 600,
+    h = 500;
+
+var svg = d3.select("body")
+            .append("svg")
+            .attr("width", w)
+            .attr("height", h);
+
+var wt_range = [d3.min(dataset, function(d) { return d.wt; }), d3.max(dataset, function(d) { return d.wt; })];
+var mpg_range = [d3.min(dataset, function(d) { return d.mpg; }), d3.max(dataset, function(d) { return d.mpg; } )];
+
+svg.selectAll("circle")
+    .data(dataset)
+    .enter()
+    .append("circle")
+    .attr("r", 4)
+    .attr("cx", function(d, i) {
+                   return w*(d.wt - wt_range[0])/(wt_range[1] - wt_range[0]);
+                })
+    .attr("cy", function(d) {
+                   return h* (1 - (d.mpg - mpg_range[0])/(mpg_range[1] - mpg_range[0]));
+                })
+    .attr("fill", "red");
+</script>
+
+
+<p>
+
+The JavaScript code creates the circles and places them at the same vertical position.
+We calculate the horizontal position based on the index of the observation.
+This is passed to our function via our parameter i.
+Our other parameter d contains the actual observation.
+(If we only had one parameter, the index is not passed.)
+
+
+
+<hr>
+<address><a href="http://www.stat.ucdavis.edu/~duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@r-project.org>&lt;duncan@r-project.org&gt;</a></address>
+<!-- hhmts start --> Last modified: Wed Jun  3 16:39:13 PDT 2015 <!-- hhmts end -->
+</body> </html>
