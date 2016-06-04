@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Simple Scatter Plot</title>
+<meta charset="utf-8">
+<script type="text/javascript" src="../d3/d3.min.js"></script>
+
+<script type="text/javascript" src="first.json"></script>
+<script type="text/javascript" src="second.json"></script>
+<script type="text/javascript" src="third.json"></script>
+
+<style>
+#A {
+ background: #F0FFFF;
+}
+
+#B {
+ background: #E6E6FA;
+}
+
+#C {
+ background: #F0E68C;
+}
+
+p.adding {
+ color: green;
+}
+p.remove {
+ color: red;
+}
+</style>
+</head>
+
+<body>
+<h1></h1>
+
+<p>
+This illustrates binding a dataset, and then a second dataset and then a third
+and the state of the different enter(), exit() and update selections.
+Added elements are shown in green when they are added and the dataset from which they came is also displayed.
+We remove the elements corresponding to the observations in the previous dataset that are not in the new dataset.
+The second dataset is bound to the elements after 2 seconds, and then the third 2 seconds after that.
+
+</p>
+
+<div id="A">
+</div>
+
+
+<div id="B">
+</div>
+
+<div id="C">
+</div>
+
+
+<script type="text/javascript">
+
+var A = d3.select("#A");
+  A.selectAll("p")
+   .data(first, function(d, i) {return d[0];})
+   .enter()
+   .append("p")
+   .text(function(d, i){ return( d[0] + " " + d[1]);});
+
+function update(newdata, label) {
+            var sel = A.selectAll("p")
+                       .data(newdata, function(d, i) {return d[0];});
+
+            var B = d3.select("#B");
+            B.append("p").text("[" + label + "] # new items " + sel.enter().size() + " ;  items to remove " + sel.exit().size() + " ; in  selection " + sel.size() );
+
+            sel.exit().remove();
+            sel.enter().append("p").attr("class", "adding").text(function(d, i){ return( "[" + label + "] " + d[0] + " " + d[1]);});
+}
+
+
+ setTimeout(function() { 
+              update(second, "second");
+	      setTimeout(function() { 
+                update(third, "third");
+              }, 2000);
+           }, 2000);
+
+
+</script>
+
+
+</body>
+</html>
