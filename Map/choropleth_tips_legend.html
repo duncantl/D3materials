@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.counties {
+  fill: none;
+}
+
+.states {
+  fill: none;
+  stroke: #fff;
+  stroke-linejoin: round;
+}
+
+.q0-9 { fill:rgb(247,251,255); }
+.q1-9 { fill:rgb(222,235,247); }
+.q2-9 { fill:rgb(198,219,239); }
+.q3-9 { fill:rgb(158,202,225); }
+.q4-9 { fill:rgb(107,174,214); }
+.q5-9 { fill:rgb(66,146,198); }
+.q6-9 { fill:rgb(33,113,181); }
+.q7-9 { fill:rgb(8,81,156); }
+.q8-9 { fill:rgb(8,48,107); }
+
+.key path {
+  display: none;
+}
+
+.key line {
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+</style>
+<body>
+<script src="../d3/d3.min.js"></script>
+<script src="../d3/queue.v1.min.js"></script>
+<script src="../d3/topojson.v1.min.js"></script>
+<script>
+
+var width = 960,
+    height = 600;
+
+var rateById = d3.map();
+var countyInfo = d3.map();
+
+var projection = d3.geo.albersUsa()
+    .scale(1080) // changed from 1280 to make space for the key.
+    .translate([width / 2, height / 2]);
+
+var path = d3.geo.path()
+    .projection(projection);
+
+var colors = [ "#F7FBFF", "#DEEBF7", "#C6DBEF", "#9ECAE1", "#6BAED6", "#4292C6", "#2171B5", "#08519C", "#08306B" ] ;
+
+var svg = d3.select("body").append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+var quantize = d3.scale.quantize()
+                 .domain([0, .30])
+		 .range(colors);
+//                 .range(d3.range(9).map(function(i) { return "q" + i + "-9"; }));
+
+queue()
+    .defer(d3.json, "us.json")
+    .defer(d3.tsv, "unemployment.tsv", function(d) { rateById.set(d.id, +d.rate); })
+    .defer(d3.tsv, "countyInfo.tsv", function(d) { countyInfo.set(d.INCITS, d); })
+    .await(ready);
+
+
+function ready(error, us) {
+  if (error) throw error;
+
+  svg.append("g")
+     .attr("class", "counties")
+     .selectAll("path")
+     .data(topojson.feature(us, us.objects.counties).features)
+     .enter().append("path")
+//      .attr("class", function(d) { return quantize(rateById.get(d.id)); })
+      .attr("class", "county")
+      .attr("fill", function(d) { return quantize(rateById.get(d.id)); })
+      .attr("d", path)
+      .append("svg:title")
+      .text(function(d) { 
+           var obj = countyInfo.get("" + d.id);
+           return ( (obj ? obj.Name : "?")  + " " + formatPercent(rateById.get(d.id) ));
+        });
+
+  svg.append("path")
+      .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+      .attr("class", "states")
+      .attr("d", path);
+}
+
+d3.select(self.frameElement).style("height", height + "px");
+
+
+// add a key/legend
+// Adapted from http://bl.ocks.org/stewartnoyce/9417919
+var formatPercent = d3.format(".0%");
+// return quantize thresholds for the key    
+// This computes the values for the tick marks, i.e. the unemployment % for each color interval
+var qrange = function(max, num) {
+    var a = [];
+    for (var i=0; i<=num; i++) {
+        a.push(i*max/num);
+    }
+    return a;
+}
+
+  var x = d3.scale.linear()
+            .domain([0, .30])
+            .range([0, 575]);
+
+  var xAxis = d3.svg.axis()
+                .scale(x)
+                .orient("bottom")
+                .tickSize(14)
+                .tickValues(qrange(quantize.domain()[1], quantize.range().length))
+//                .tickValues(quantize.domain())
+                .tickFormat(function(d) { return formatPercent(d); });
+
+  // put the key into a <g> and then move it to where we want it.
+  var g = svg.append("g")
+             .attr("class", "key")
+             .attr("transform", "translate(480, 570)");
+
+   // create color rectangles as part of the key to represent the different visual values
+   // and their colors
+  g.selectAll("rect")
+    .data(quantize.range().map(function(color) {
+        // for each color in quantize, compute the 
+        // range of unemployment percentages that this color covers
+        // in quantize
+      var d = quantize.invertExtent(color);
+console.log(d);
+      if (d[0] == null) d[0] = x.domain()[0];
+      if (d[1] == null) d[1] = x.domain()[1];
+      return d;
+    }))
+  .enter().append("rect")
+    .attr("height", 10)
+    .attr("x", function(d) { return x(d[0]); })
+    .attr("width", function(d) { return x(d[1]) - x(d[0]); })
+    .style("fill", function(d) { return quantize(d[0]); });
+
+// Put a caption on the legend/key
+  g.call(xAxis).append("text")
+    .attr("class", "caption")
+    .attr("y", -6)
+    .text("Unemployment rate");
+</script>
