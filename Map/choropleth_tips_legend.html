@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-
 svg { 
   border: solid 1pt black;
 }
@@ -39,6 +38,7 @@ svg {
 <script src="../d3/d3.min.js"></script>
 <script src="../d3/queue.v1.min.js"></script>
 <script src="../d3/topojson.v1.min.js"></script>
+<body>
 <script>
 
 var width = 960,
@@ -127,7 +127,7 @@ var qrange = function(max, num) {
   // put the key into a <g> and then move it to where we want it.
   var g = svg.append("g")
              .attr("class", "key")
-             .attr("transform", "translate(350, 570)");
+             .attr("transform", "translate(225, 20)");
 
    // create color rectangles as part of the key to represent the different visual values
    // and their colors
@@ -154,3 +154,9 @@ console.log(d);
     .attr("y", -6)
     .text("Unemployment rate");
 </script>
+
+<p>
+The unemployment range is hard coded into this. This gives rise to the possibility of the 
+data changing and the colors being incorrect.
+</p>
+</body>
