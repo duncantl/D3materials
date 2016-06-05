@@ -2,6 +2,10 @@
 <meta charset="utf-8">
 <style>
 
+svg { 
+  border: solid 1pt black;
+}
+
 .counties {
   fill: none;
 }
@@ -123,7 +127,7 @@ var qrange = function(max, num) {
   // put the key into a <g> and then move it to where we want it.
   var g = svg.append("g")
              .attr("class", "key")
-             .attr("transform", "translate(480, 570)");
+             .attr("transform", "translate(350, 570)");
 
    // create color rectangles as part of the key to represent the different visual values
    // and their colors
